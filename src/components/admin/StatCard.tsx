@@ -1,0 +1,39 @@
+import type { LucideIcon } from "lucide-react";
+import { Card } from "@/components/ui/Card";
+import { cn } from "@/lib/utils";
+
+export function StatCard({
+  icon: Icon,
+  label,
+  value,
+  trend,
+  tone = "neutral",
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  trend?: string;
+  tone?: "neutral" | "success" | "warning" | "danger";
+}) {
+  const toneClass = {
+    neutral: "text-primary-strong bg-primary/10",
+    success: "text-success bg-[var(--success-soft)]",
+    warning: "text-warning bg-[var(--warning-soft)]",
+    danger: "text-danger bg-[var(--danger-soft)]",
+  }[tone];
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-2">{label}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
+          {trend && <p className="mt-1 text-xs text-muted">{trend}</p>}
+        </div>
+        <div className={cn("clip-x-sm flex h-10 w-10 shrink-0 items-center justify-center", toneClass)}>
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+      </div>
+    </Card>
+  );
+}
