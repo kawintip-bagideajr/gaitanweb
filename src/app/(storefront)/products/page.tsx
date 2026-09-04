@@ -7,6 +7,9 @@ import { ProductCard } from "@/components/marketplace/ProductCard";
 import { cn, TIER_STYLES } from "@/lib/utils";
 import { getAllProducts, getGames } from "@/lib/queries";
 
+// See src/app/(storefront)/games/page.tsx for why this is forced dynamic.
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage({
   searchParams,
 }: {

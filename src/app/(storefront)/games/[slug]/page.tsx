@@ -7,6 +7,9 @@ import { getGameTheme } from "@/lib/game-theme";
 import { getAllProducts, getGameBySlug } from "@/lib/queries";
 import type { Product } from "@/types";
 
+// See src/app/(storefront)/games/page.tsx for why this is forced dynamic.
+export const dynamic = "force-dynamic";
+
 function groupByCategory(products: Product[]) {
   const groups = new Map<string, Product[]>();
   for (const p of products) {

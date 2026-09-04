@@ -6,6 +6,9 @@ import { Tabs } from "@/components/ui/Tabs";
 import { ProductBuyPanel } from "@/components/marketplace/ProductBuyPanel";
 import { getGames, getProductBySlug } from "@/lib/queries";
 
+// See src/app/(storefront)/games/page.tsx for why this is forced dynamic.
+export const dynamic = "force-dynamic";
+
 export default async function ProductDetailPage({
   params,
 }: {

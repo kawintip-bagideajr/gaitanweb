@@ -2,6 +2,11 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { GameCard } from "@/components/marketplace/GameCard";
 import { getGames } from "@/lib/queries";
 
+// Without this, Next prerenders this page once at build time (no cookies/
+// dynamic API is used, so it defaults to static) and admin catalog edits —
+// or a reseed like this session's — never show up until the next deploy.
+export const dynamic = "force-dynamic";
+
 export default async function GamesPage() {
   const games = await getGames();
 
