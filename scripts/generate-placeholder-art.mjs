@@ -164,6 +164,57 @@ function emblemGem(cx, cy, size, color) {
   `;
 }
 
+function emblemCoin(cx, cy, size, color) {
+  // Round point/coin token — the countable "unit" for point-based
+  // currencies (Valorant Points) in a pile().
+  const r = size * 0.42;
+  return `
+    <g transform="translate(${cx} ${cy})" opacity="0.92">
+      <circle cx="0" cy="0" r="${r}" fill="${color}" opacity="0.85"/>
+      <circle cx="0" cy="0" r="${r * 0.7}" fill="none" stroke="${BG}" stroke-width="${(r * 0.12).toFixed(1)}" opacity="0.5"/>
+      <path d="M ${(-r * 0.3).toFixed(1)} ${(-r * 0.12).toFixed(1)} L 0 ${(r * 0.3).toFixed(1)} L ${(r * 0.3).toFixed(1)} ${(-r * 0.12).toFixed(1)}"
+        fill="none" stroke="${BG}" stroke-width="${(r * 0.14).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    </g>
+  `;
+}
+
+function treasureChest(cx, cy, size, color) {
+  // Abstract treasure-chest silhouette for the top price tier — domed
+  // lid, strap band, keyhole.
+  const w = size * 0.85;
+  const h = size * 0.62;
+  return `
+    <g transform="translate(${cx} ${cy})" opacity="0.95">
+      <path d="M ${(-w / 2).toFixed(1)} ${(-h * 0.05).toFixed(1)} Q 0 ${(-h * 0.68).toFixed(1)} ${(w / 2).toFixed(1)} ${(-h * 0.05).toFixed(1)} Z" fill="${color}" opacity="0.85"/>
+      <rect x="${(-w / 2).toFixed(1)}" y="${(-h * 0.05).toFixed(1)}" width="${w.toFixed(1)}" height="${(h * 0.6).toFixed(1)}" rx="6" fill="${color}" opacity="0.85"/>
+      <rect x="${(-w / 2).toFixed(1)}" y="${(-h * 0.08).toFixed(1)}" width="${w.toFixed(1)}" height="${(h * 0.1).toFixed(1)}" fill="${BG}" opacity="0.4"/>
+      <circle cx="0" cy="${(h * 0.24).toFixed(1)}" r="${(h * 0.12).toFixed(1)}" fill="${BG}" opacity="0.6"/>
+      <rect x="${(-h * 0.03).toFixed(1)}" y="${(h * 0.24).toFixed(1)}" width="${(h * 0.06).toFixed(1)}" height="${(h * 0.18).toFixed(1)}" fill="${BG}" opacity="0.6"/>
+    </g>
+  `;
+}
+
+// Scatters `count` copies of a unit emblem around (cx, cy) — a "pile" of
+// the countable currency, flattened vertically so it reads as resting
+// on a surface rather than floating.
+function pile(cx, cy, unitFn, color, count, spread, unitSize, seed) {
+  let s = seed;
+  const rand = () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+  let out = "";
+  for (let i = 0; i < count; i++) {
+    const angle = rand() * Math.PI * 2;
+    const dist = rand() * spread;
+    const x = cx + Math.cos(angle) * dist;
+    const y = cy + Math.sin(angle) * dist * 0.55;
+    const sizeVar = unitSize * (0.72 + rand() * 0.5);
+    out += unitFn(x, y, sizeVar, color);
+  }
+  return out;
+}
+
 function emblemTicket(cx, cy, size, color) {
   // Coupon/voucher silhouette — rounded bar with punched notches and a
   // tear-line, reads unambiguously as "coupon" at a glance.
@@ -240,22 +291,45 @@ const PRODUCTS = [
   { file: "rov-coupon-620.svg", accent: "#c7ecfd", scale: 1.15, particleCount: 28, seed: 505, emblem: emblemTicket },
   { file: "rov-coupon-1240.svg", accent: "#eaf8fe", scale: 1.3, particleCount: 34, seed: 506, emblem: emblemTicket },
 
-  // Valorant — Valorant Points
-  { file: "valorant-vp-475.svg", accent: "#fb7185", scale: 0.75, particleCount: 10, seed: 401, emblem: emblemBlade },
-  { file: "valorant-vp-1000.svg", accent: "#fc8b9c", scale: 0.9, particleCount: 16, seed: 402, emblem: emblemBlade },
-  { file: "valorant-vp-2050.svg", accent: "#fda5b3", scale: 1.0, particleCount: 22, seed: 403, emblem: emblemBlade },
-  { file: "valorant-vp-3650.svg", accent: "#fdbfc9", scale: 1.15, particleCount: 28, seed: 404, emblem: emblemBlade },
-  { file: "valorant-vp-5350.svg", accent: "#fed9e0", scale: 1.3, particleCount: 34, seed: 405, emblem: emblemBlade },
+  // Valorant — Valorant Points (coin/point token — blade stays on the
+  // game-cover banner only, a pile of blades wouldn't read as "points")
+  { file: "valorant-vp-475.svg", accent: "#fb7185", scale: 0.75, particleCount: 10, seed: 401, emblem: emblemCoin },
+  { file: "valorant-vp-1000.svg", accent: "#fc8b9c", scale: 0.9, particleCount: 16, seed: 402, emblem: emblemCoin },
+  { file: "valorant-vp-2050.svg", accent: "#fda5b3", scale: 1.0, particleCount: 22, seed: 403, emblem: emblemCoin },
+  { file: "valorant-vp-3650.svg", accent: "#fdbfc9", scale: 1.15, particleCount: 28, seed: 404, emblem: emblemCoin },
+  { file: "valorant-vp-5350.svg", accent: "#fed9e0", scale: 1.3, particleCount: 34, seed: 405, emblem: emblemCoin },
 ];
 
+// The cheapest denomination gets a small handful of the unit emblem;
+// the priciest gets a treasure chest overflowing with them — visually
+// encodes "how much you get", matching how real top-up shops do it.
 function renderProductCover({ accent, scale, particleCount, seed, emblem = emblemGem }) {
   const w = 800, h = 800;
+  const cx = w / 2;
+  const cy = h / 2 + 15;
+
+  let contents;
+  if (scale >= 1.2) {
+    contents = `
+      ${treasureChest(cx, cy + 55, 430, accent)}
+      ${pile(cx, cy - 55, emblem, accent, 9, 165, 85, seed)}
+    `;
+  } else if (scale >= 1.05) {
+    contents = pile(cx, cy, emblem, accent, 6, 135, 92, seed);
+  } else if (scale >= 0.95) {
+    contents = pile(cx, cy, emblem, accent, 4, 95, 98, seed);
+  } else if (scale >= 0.8) {
+    contents = pile(cx, cy, emblem, accent, 3, 65, 104, seed);
+  } else {
+    contents = pile(cx, cy, emblem, accent, 2, 38, 112, seed);
+  }
+
   const inner = `
     ${grid(w, h, "grid")}
     ${glow(w / 2, h / 2, 360 * scale, accent, "glow1")}
     ${rays(w / 2, h / 2, 12, 320 * scale, accent, seed)}
     ${particles(w, h, accent, particleCount, seed)}
-    ${emblem(w / 2, h / 2, 340 * scale, accent)}
+    ${contents}
     ${xAccent(w, h, accent)}
     <rect x="1" y="1" width="${w - 2}" height="${h - 2}" fill="none" stroke="${BORDER}" stroke-width="2"/>
   `;
