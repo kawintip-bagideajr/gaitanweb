@@ -27,12 +27,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             stacking context. */}
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
           <filter id="logo-cutout-filter">
+            {/* Alpha row is luma weights boosted ~1.8x (clamps to fully
+                opaque past a moderate brightness) so mid-tones read as
+                solid color instead of a faded, translucent wash. */}
             <feColorMatrix
               type="matrix"
               values="1 0 0 0 0
                       0 1 0 0 0
                       0 0 1 0 0
-                      0.2126 0.7152 0.0722 0 0"
+                      0.38 1.29 0.13 0 0"
             />
           </filter>
         </svg>

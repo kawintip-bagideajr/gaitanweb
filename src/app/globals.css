@@ -204,9 +204,11 @@ body {
 }
 
 /* Turns black background transparent on logo art with no alpha channel
-   — see the <filter id="logo-cutout-filter"> in the root layout. */
+   — see the <filter id="logo-cutout-filter"> in the root layout.
+   saturate/contrast/brightness punch the color up so it reads bold
+   and solid rather than soft and washed out. */
 .logo-cutout {
-  filter: url(#logo-cutout-filter);
+  filter: url(#logo-cutout-filter) saturate(1.5) contrast(1.15) brightness(1.08);
 }
 
 /* ---------- Motion ---------- */
@@ -231,10 +233,12 @@ body {
 @keyframes glow-pulse {
   0%,
   100% {
-    filter: url(#logo-cutout-filter) drop-shadow(0 0 24px rgba(124, 58, 237, 0.55));
+    filter: url(#logo-cutout-filter) saturate(1.5) contrast(1.15) brightness(1.08)
+      drop-shadow(0 0 28px rgba(124, 58, 237, 0.65));
   }
   50% {
-    filter: url(#logo-cutout-filter) drop-shadow(0 0 44px rgba(124, 58, 237, 0.85));
+    filter: url(#logo-cutout-filter) saturate(1.5) contrast(1.15) brightness(1.08)
+      drop-shadow(0 0 50px rgba(124, 58, 237, 0.95));
   }
 }
 .animate-glow-pulse {
