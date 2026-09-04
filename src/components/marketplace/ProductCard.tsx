@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
   const tier = getProductTier(product.price);
   const tierStyle = TIER_STYLES[tier];
-  const theme = getGameTheme(product.gameName);
+  const theme = getGameTheme(product.category ?? product.gameName);
   const isLegendary = tier === "LEGENDARY";
   const stockPct = Math.round((Math.min(product.stockCount, STOCK_BAR_CAP) / STOCK_BAR_CAP) * 100);
 
@@ -81,7 +81,7 @@ export function ProductCard({ product }: { product: Product }) {
 
           <div className="flex flex-1 flex-col gap-1 p-4">
             <span className="text-xs font-medium uppercase tracking-wide text-muted-2">
-              {product.gameName}
+              {product.category ?? product.gameName}
             </span>
             <h3 className="text-sm font-semibold text-foreground">{product.title}</h3>
             {product.subtitle && (

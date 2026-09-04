@@ -26,6 +26,7 @@ export interface Product {
   gameName: string;
   title: string;
   subtitle?: string;
+  category?: string;
   image: string;
   price: number;
   currency: "THB";

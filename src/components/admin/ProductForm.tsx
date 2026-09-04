@@ -16,13 +16,14 @@ export interface ProductFormValues {
   gameId: string;
   title: string;
   subtitle: string;
+  category: string;
   price: number;
   autoDelivery: boolean;
 }
 
 export function ProductForm({ games, initial }: { games: GameOption[]; initial?: ProductFormValues }) {
   const [values, setValues] = useState<ProductFormValues>(
-    initial ?? { gameId: games[0]?.id ?? "", title: "", subtitle: "", price: 0, autoDelivery: true }
+    initial ?? { gameId: games[0]?.id ?? "", title: "", subtitle: "", category: "", price: 0, autoDelivery: true }
   );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +42,7 @@ export function ProductForm({ games, initial }: { games: GameOption[]; initial?:
         gameId: values.gameId,
         title: values.title,
         subtitle: values.subtitle,
+        category: values.category,
         price: Number(values.price),
         autoDelivery: values.autoDelivery,
       }),
@@ -87,6 +89,12 @@ export function ProductForm({ games, initial }: { games: GameOption[]; initial?:
           value={values.subtitle}
           onChange={(e) => setValues((v) => ({ ...v, subtitle: e.target.value }))}
           placeholder="500 ROBUX"
+        />
+        <Input
+          label="หมวดหมู่ (เช่น Robux, Blox Fruits, เพชร) — ไม่บังคับ"
+          value={values.category}
+          onChange={(e) => setValues((v) => ({ ...v, category: e.target.value }))}
+          placeholder="Robux"
         />
         <Input
           label="ราคา (บาท)"

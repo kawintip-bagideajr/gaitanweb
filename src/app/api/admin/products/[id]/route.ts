@@ -33,10 +33,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const existing = await db.product.findUnique({ where: { id } });
     if (!existing) return NextResponse.json({ error: "ไม่พบสินค้า" }, { status: 404 });
 
-    const { subtitle, ...rest } = parsed.data;
+    const { subtitle, category, ...rest } = parsed.data;
     const product = await db.product.update({
       where: { id },
-      data: { ...rest, ...(subtitle !== undefined ? { subtitle: subtitle || null } : {}) },
+      data: {
+        ...rest,
+        ...(subtitle !== undefined ? { subtitle: subtitle || null } : {}),
+        ...(category !== undefined ? { category: category || null } : {}),
+      },
     });
 
     await writeAuditLog(admin.id, "product.update", "Product", product.id, parsed.data);

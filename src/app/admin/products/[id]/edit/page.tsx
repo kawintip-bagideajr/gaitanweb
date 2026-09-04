@@ -19,6 +19,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           gameId: product.gameId,
           title: product.title,
           subtitle: product.subtitle ?? "",
+          category: product.category ?? "",
           price: product.price,
           autoDelivery: product.autoDelivery,
         }}

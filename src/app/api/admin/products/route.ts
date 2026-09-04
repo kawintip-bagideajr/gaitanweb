@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
         gameId: parsed.data.gameId,
         title: parsed.data.title,
         subtitle: parsed.data.subtitle || null,
+        category: parsed.data.category || null,
         price: parsed.data.price,
         autoDelivery: parsed.data.autoDelivery,
         slug: slugify(parsed.data.title, parsed.data.subtitle),

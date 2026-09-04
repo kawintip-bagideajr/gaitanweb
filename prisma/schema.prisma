@@ -83,6 +83,9 @@ model Product {
   subtitle     String?
   description  String?
   image        String?
+  // Sub-grouping within a game's product page (e.g. "Robux", "Blox Fruits",
+  // "เพชร") — purely presentational, no relation of its own.
+  category     String?
   // Whole-currency-unit price (THB baht, no decimals) — matches how
   // these gift card denominations are actually priced/sold.
   price        Int

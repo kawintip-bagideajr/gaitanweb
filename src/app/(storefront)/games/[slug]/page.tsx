@@ -3,7 +3,20 @@ import { Gamepad2 } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { getGameTheme } from "@/lib/game-theme";
 import { getAllProducts, getGameBySlug } from "@/lib/queries";
+import type { Product } from "@/types";
+
+function groupByCategory(products: Product[]) {
+  const groups = new Map<string, Product[]>();
+  for (const p of products) {
+    const key = p.category ?? "สินค้าทั้งหมด";
+    const list = groups.get(key);
+    if (list) list.push(p);
+    else groups.set(key, [p]);
+  }
+  return Array.from(groups.entries());
+}
 
 export default async function GameDetailPage({
   params,
@@ -15,6 +28,7 @@ export default async function GameDetailPage({
   if (!game) notFound();
 
   const products = await getAllProducts(slug);
+  const categories = groupByCategory(products);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -33,10 +47,27 @@ export default async function GameDetailPage({
       {products.length === 0 ? (
         <EmptyState title="ยังไม่มีสินค้าสำหรับเกมนี้" description="กลับมาดูใหม่อีกครั้งเร็ว ๆ นี้" />
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <div className="flex flex-col gap-12">
+          {categories.map(([category, items]) => {
+            const theme = getGameTheme(category);
+            return (
+              <section key={category}>
+                <div className="mb-5 flex items-center gap-2.5">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ background: theme.accent, boxShadow: `0 0 12px ${theme.glow}` }}
+                  />
+                  <h2 className="text-lg font-bold text-foreground">{category}</h2>
+                  <span className="text-sm text-muted-2">{items.length} รายการ</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+                  {items.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

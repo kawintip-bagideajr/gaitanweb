@@ -1,8 +1,10 @@
 /**
- * Per-game accent color, keyed loosely by game name or slug (normalized —
- * case/spaces/dashes ignored) so it works whether the caller has a
- * Game.slug or a Product.gameName. Purely visual — breaks up the
- * mono-violet look with a distinct color per game.
+ * Accent color keyed loosely by game name/slug OR product category
+ * (normalized — case/spaces/dashes ignored), so the same lookup themes
+ * both game cards (by Game.slug) and product cards (by
+ * Product.category, falling back to Product.gameName) — e.g. "Blox
+ * Fruits" gets its own color even though it's a Roblox category, not
+ * a separate game.
  */
 export interface GameTheme {
   accent: string;
@@ -17,20 +19,21 @@ const DEFAULT: GameTheme = {
 };
 
 const THEMES: Record<string, GameTheme> = {
-  roblox: {
-    accent: "#8b5cf6",
-    glow: "rgba(139, 92, 246, 0.45)",
-    gradient: "linear-gradient(135deg, #8b5cf6, #c026d3)",
-  },
+  roblox: DEFAULT,
   bloxfruits: {
     accent: "#22d3ee",
     glow: "rgba(34, 211, 238, 0.45)",
     gradient: "linear-gradient(135deg, #22d3ee, #0ea5e9)",
   },
-  minecraft: {
-    accent: "#4ade80",
-    glow: "rgba(74, 222, 128, 0.45)",
-    gradient: "linear-gradient(135deg, #4ade80, #16a34a)",
+  freefire: {
+    accent: "#f97316",
+    glow: "rgba(249, 115, 22, 0.45)",
+    gradient: "linear-gradient(135deg, #fb923c, #dc2626)",
+  },
+  rov: {
+    accent: "#38bdf8",
+    glow: "rgba(56, 189, 248, 0.45)",
+    gradient: "linear-gradient(135deg, #38bdf8, #6366f1)",
   },
   valorant: {
     accent: "#fb7185",

@@ -94,25 +94,6 @@ function emblemBlob(cx, cy, size, color) {
   `;
 }
 
-function emblemPixelGrid(cx, cy, size, color) {
-  // 3x3 offset cube grid — generic voxel motif.
-  const cell = size * 0.26;
-  const gap = cell * 0.18;
-  let out = `<g transform="translate(${cx - cell * 1.5} ${cy - cell * 1.5})" opacity="0.9">`;
-  const positions = [
-    [0, 0, 0.9], [1, 0, 0.5], [2, 0, 0.7],
-    [0, 1, 0.6], [1, 1, 1], [2, 1, 0.55],
-    [0, 2, 0.75], [1, 2, 0.45], [2, 2, 0.85],
-  ];
-  for (const [gx, gy, o] of positions) {
-    const x = gx * (cell + gap);
-    const y = gy * (cell + gap);
-    out += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="4" fill="${color}" opacity="${o}"/>`;
-  }
-  out += "</g>";
-  return out;
-}
-
 function emblemBlade(cx, cy, size, color) {
   // Angular triangle cluster — sharp/competitive vibe.
   const s = size * 0.55;
@@ -139,8 +120,8 @@ function emblemGem(cx, cy, size, color) {
 // Accent per game matches src/lib/game-theme.ts — keep in sync.
 const GAMES = [
   { file: "roblox.svg", accent: "#8b5cf6", emblem: emblemCubes, seed: 11 },
-  { file: "blox-fruits.svg", accent: "#22d3ee", emblem: emblemBlob, seed: 22 },
-  { file: "minecraft.svg", accent: "#4ade80", emblem: emblemPixelGrid, seed: 33 },
+  { file: "free-fire.svg", accent: "#f97316", emblem: emblemBlob, seed: 22 },
+  { file: "rov.svg", accent: "#38bdf8", emblem: emblemGem, seed: 33 },
   { file: "valorant.svg", accent: "#fb7185", emblem: emblemBlade, seed: 44 },
 ];
 
@@ -159,23 +140,36 @@ function renderGameCover({ accent, emblem, seed }) {
 }
 
 const PRODUCTS = [
+  // Roblox — general Robux
   { file: "roblox-gift-card-100.svg", accent: "#8b5cf6", scale: 0.7, particleCount: 8, seed: 101 },
   { file: "roblox-gift-card-250.svg", accent: "#9370f5", scale: 0.8, particleCount: 12, seed: 102 },
   { file: "roblox-gift-card-500.svg", accent: "#a78bfa", scale: 0.9, particleCount: 16, seed: 103 },
   { file: "roblox-gift-card-800.svg", accent: "#b7a3fc", scale: 1.0, particleCount: 22, seed: 104 },
   { file: "roblox-gift-card-1700.svg", accent: "#c4b5fd", scale: 1.15, particleCount: 30, seed: 105 },
 
-  { file: "blox-fruits-robux-400.svg", accent: "#22d3ee", scale: 0.75, particleCount: 10, seed: 201, emblem: emblemBlob },
-  { file: "blox-fruits-robux-800.svg", accent: "#45dcf0", scale: 0.9, particleCount: 16, seed: 202, emblem: emblemBlob },
-  { file: "blox-fruits-robux-1700.svg", accent: "#6ce4f3", scale: 1.0, particleCount: 22, seed: 203, emblem: emblemBlob },
-  { file: "blox-fruits-robux-4500.svg", accent: "#93ecf6", scale: 1.2, particleCount: 30, seed: 204, emblem: emblemBlob },
+  // Roblox — "Blox Fruits" category (still Robux, themed cyan to stand out)
+  { file: "roblox-bloxfruits-robux-400.svg", accent: "#22d3ee", scale: 0.75, particleCount: 10, seed: 201, emblem: emblemBlob },
+  { file: "roblox-bloxfruits-robux-800.svg", accent: "#45dcf0", scale: 0.9, particleCount: 16, seed: 202, emblem: emblemBlob },
+  { file: "roblox-bloxfruits-robux-1700.svg", accent: "#6ce4f3", scale: 1.0, particleCount: 22, seed: 203, emblem: emblemBlob },
+  { file: "roblox-bloxfruits-robux-4500.svg", accent: "#93ecf6", scale: 1.2, particleCount: 30, seed: 204, emblem: emblemBlob },
 
-  { file: "minecraft-game-key.svg", accent: "#4ade80", scale: 1.0, particleCount: 18, seed: 301, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-320.svg", accent: "#4ade80", scale: 0.75, particleCount: 10, seed: 302, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-1020.svg", accent: "#69e396", scale: 0.9, particleCount: 16, seed: 303, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-1720.svg", accent: "#8fedb2", scale: 1.0, particleCount: 22, seed: 304, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-3500.svg", accent: "#b5f5cd", scale: 1.2, particleCount: 30, seed: 305, emblem: emblemPixelGrid },
+  // Free Fire — เพชร (diamonds)
+  { file: "freefire-diamond-58.svg", accent: "#f97316", scale: 0.7, particleCount: 8, seed: 301, emblem: emblemBlob },
+  { file: "freefire-diamond-172.svg", accent: "#fa8a3f", scale: 0.85, particleCount: 12, seed: 302, emblem: emblemBlob },
+  { file: "freefire-diamond-310.svg", accent: "#fb9d5f", scale: 0.95, particleCount: 18, seed: 303, emblem: emblemBlob },
+  { file: "freefire-diamond-517.svg", accent: "#fcb080", scale: 1.05, particleCount: 24, seed: 304, emblem: emblemBlob },
+  { file: "freefire-diamond-1052.svg", accent: "#fdc3a0", scale: 1.15, particleCount: 28, seed: 305, emblem: emblemBlob },
+  { file: "freefire-diamond-3698.svg", accent: "#fed7c0", scale: 1.3, particleCount: 34, seed: 306, emblem: emblemBlob },
 
+  // RoV — คูปอง (coupons)
+  { file: "rov-coupon-60.svg", accent: "#38bdf8", scale: 0.7, particleCount: 8, seed: 501 },
+  { file: "rov-coupon-110.svg", accent: "#5cc9fa", scale: 0.85, particleCount: 12, seed: 502 },
+  { file: "rov-coupon-185.svg", accent: "#80d5fb", scale: 0.95, particleCount: 18, seed: 503 },
+  { file: "rov-coupon-370.svg", accent: "#a3e0fc", scale: 1.05, particleCount: 24, seed: 504 },
+  { file: "rov-coupon-620.svg", accent: "#c7ecfd", scale: 1.15, particleCount: 28, seed: 505 },
+  { file: "rov-coupon-1240.svg", accent: "#eaf8fe", scale: 1.3, particleCount: 34, seed: 506 },
+
+  // Valorant — Valorant Points
   { file: "valorant-vp-475.svg", accent: "#fb7185", scale: 0.75, particleCount: 10, seed: 401, emblem: emblemBlade },
   { file: "valorant-vp-1000.svg", accent: "#fc8b9c", scale: 0.9, particleCount: 16, seed: 402, emblem: emblemBlade },
   { file: "valorant-vp-2050.svg", accent: "#fda5b3", scale: 1.0, particleCount: 22, seed: 403, emblem: emblemBlade },

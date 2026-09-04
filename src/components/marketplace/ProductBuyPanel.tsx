@@ -21,7 +21,9 @@ export function ProductBuyPanel({ product }: { product: Product }) {
       <div>
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-2">
-            {product.gameName}
+            {product.category && product.category !== product.gameName
+              ? `${product.gameName} · ${product.category}`
+              : product.gameName}
           </span>
           <Badge tone={tierStyle.badgeTone} className="font-bold tracking-wider">
             {tierStyle.label}

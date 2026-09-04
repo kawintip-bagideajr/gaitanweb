@@ -3,46 +3,68 @@ import bcrypt from "bcryptjs";
 
 const db = new PrismaClient();
 
-// Same catalog shape as the old src/lib/mock-data.ts placeholder —
-// this is now the single source of truth, loaded into the real DB.
+// The 4 most-topped-up games in the Thai market (Roblox, Free Fire, RoV,
+// Valorant) — this is now the single source of truth, loaded into the
+// real DB. Blox Fruits is NOT a separate game here — it's a Roblox
+// experience (runs on Robux), so it's a *category* under Roblox instead
+// (see PRODUCTS below).
 const GAMES = [
   { slug: "roblox", name: "Roblox", coverImage: "/games/roblox.svg" },
-  { slug: "blox-fruits", name: "Blox Fruits", coverImage: "/games/blox-fruits.svg" },
-  { slug: "minecraft", name: "Minecraft", coverImage: "/games/minecraft.svg" },
+  { slug: "free-fire", name: "Free Fire", coverImage: "/games/free-fire.svg" },
+  { slug: "rov", name: "RoV: Arena of Valor", coverImage: "/games/rov.svg" },
   { slug: "valorant", name: "Valorant", coverImage: "/games/valorant.svg" },
 ] as const;
 
+// Games that used to be seeded as their own top-level Game but no longer
+// belong there (superseded by a category, or dropped for not matching
+// what people actually top up). Deactivated rather than deleted so any
+// historical orders referencing their products still resolve.
+const RETIRED_GAME_SLUGS = ["blox-fruits", "minecraft"] as const;
+
 const PRODUCTS = [
-  { slug: "roblox-gift-card-100", gameSlug: "roblox", title: "Roblox Gift Card", subtitle: "100 ROBUX", price: 35, stockCount: 6, image: "/products/roblox-gift-card-100.svg" },
-  { slug: "roblox-gift-card-250", gameSlug: "roblox", title: "Roblox Gift Card", subtitle: "250 ROBUX", price: 85, stockCount: 6, image: "/products/roblox-gift-card-250.svg" },
-  { slug: "roblox-gift-card-500", gameSlug: "roblox", title: "Roblox Gift Card", subtitle: "500 ROBUX", price: 160, stockCount: 6, image: "/products/roblox-gift-card-500.svg" },
-  { slug: "roblox-gift-card-800", gameSlug: "roblox", title: "Roblox Gift Card", subtitle: "800 ROBUX", price: 255, stockCount: 4, image: "/products/roblox-gift-card-800.svg" },
-  { slug: "roblox-gift-card-1700", gameSlug: "roblox", title: "Roblox Gift Card", subtitle: "1700 ROBUX", price: 485, stockCount: 2, image: "/products/roblox-gift-card-1700.svg" },
+  // Roblox — general Robux
+  { slug: "roblox-gift-card-100", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "100 ROBUX", price: 35, stockCount: 6, image: "/products/roblox-gift-card-100.svg" },
+  { slug: "roblox-gift-card-250", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "250 ROBUX", price: 85, stockCount: 6, image: "/products/roblox-gift-card-250.svg" },
+  { slug: "roblox-gift-card-500", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "500 ROBUX", price: 160, stockCount: 6, image: "/products/roblox-gift-card-500.svg" },
+  { slug: "roblox-gift-card-800", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "800 ROBUX", price: 255, stockCount: 4, image: "/products/roblox-gift-card-800.svg" },
+  { slug: "roblox-gift-card-1700", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "1700 ROBUX", price: 485, stockCount: 2, image: "/products/roblox-gift-card-1700.svg" },
 
-  // Blox Fruits runs on Robux (gamepasses) — same Robux gift card,
-  // marketed to Blox Fruits players specifically.
-  { slug: "blox-fruits-robux-400", gameSlug: "blox-fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "400 ROBUX", price: 135, stockCount: 5, image: "/products/blox-fruits-robux-400.svg" },
-  { slug: "blox-fruits-robux-800", gameSlug: "blox-fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "800 ROBUX", price: 255, stockCount: 5, image: "/products/blox-fruits-robux-800.svg" },
-  { slug: "blox-fruits-robux-1700", gameSlug: "blox-fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "1700 ROBUX", price: 485, stockCount: 3, image: "/products/blox-fruits-robux-1700.svg" },
-  { slug: "blox-fruits-robux-4500", gameSlug: "blox-fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "4500 ROBUX", price: 1199, stockCount: 2, image: "/products/blox-fruits-robux-4500.svg" },
+  // Roblox — "Blox Fruits" category (still Robux under the hood, just
+  // packaged/labeled for Blox Fruits players specifically).
+  { slug: "roblox-bloxfruits-robux-400", gameSlug: "roblox", category: "Blox Fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "400 ROBUX", price: 135, stockCount: 5, image: "/products/roblox-bloxfruits-robux-400.svg" },
+  { slug: "roblox-bloxfruits-robux-800", gameSlug: "roblox", category: "Blox Fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "800 ROBUX", price: 255, stockCount: 5, image: "/products/roblox-bloxfruits-robux-800.svg" },
+  { slug: "roblox-bloxfruits-robux-1700", gameSlug: "roblox", category: "Blox Fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "1700 ROBUX", price: 485, stockCount: 3, image: "/products/roblox-bloxfruits-robux-1700.svg" },
+  { slug: "roblox-bloxfruits-robux-4500", gameSlug: "roblox", category: "Blox Fruits", title: "Robux สำหรับ Blox Fruits", subtitle: "4500 ROBUX", price: 1199, stockCount: 2, image: "/products/roblox-bloxfruits-robux-4500.svg" },
 
-  { slug: "minecraft-game-key", gameSlug: "minecraft", title: "Minecraft: Java & Bedrock Edition", subtitle: "Game Key (PC)", price: 219, stockCount: 8, image: "/products/minecraft-game-key.svg" },
-  { slug: "minecraft-minecoins-320", gameSlug: "minecraft", title: "Minecraft Minecoins", subtitle: "320 Coins", price: 89, stockCount: 6, image: "/products/minecraft-minecoins-320.svg" },
-  { slug: "minecraft-minecoins-1020", gameSlug: "minecraft", title: "Minecraft Minecoins", subtitle: "1,020 Coins", price: 259, stockCount: 6, image: "/products/minecraft-minecoins-1020.svg" },
-  { slug: "minecraft-minecoins-1720", gameSlug: "minecraft", title: "Minecraft Minecoins", subtitle: "1,720 Coins", price: 419, stockCount: 4, image: "/products/minecraft-minecoins-1720.svg" },
-  { slug: "minecraft-minecoins-3500", gameSlug: "minecraft", title: "Minecraft Minecoins", subtitle: "3,500 Coins", price: 789, stockCount: 2, image: "/products/minecraft-minecoins-3500.svg" },
+  // Free Fire — เพชร (diamonds). Denominations/pricing modeled on real
+  // Thai top-up listings (SEAGM, Codashop-style resellers, Aug 2026).
+  { slug: "freefire-diamond-58", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "58 เพชร", price: 20, stockCount: 8, image: "/products/freefire-diamond-58.svg" },
+  { slug: "freefire-diamond-172", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "172 เพชร", price: 51, stockCount: 8, image: "/products/freefire-diamond-172.svg" },
+  { slug: "freefire-diamond-310", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "310 เพชร", price: 89, stockCount: 6, image: "/products/freefire-diamond-310.svg" },
+  { slug: "freefire-diamond-517", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "517 เพชร", price: 149, stockCount: 6, image: "/products/freefire-diamond-517.svg" },
+  { slug: "freefire-diamond-1052", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "1,052 เพชร", price: 309, stockCount: 4, image: "/products/freefire-diamond-1052.svg" },
+  { slug: "freefire-diamond-3698", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "3,698 เพชร", price: 1019, stockCount: 2, image: "/products/freefire-diamond-3698.svg" },
 
-  { slug: "valorant-vp-475", gameSlug: "valorant", title: "Valorant Points", subtitle: "475 VP", price: 159, stockCount: 6, image: "/products/valorant-vp-475.svg" },
-  { slug: "valorant-vp-1000", gameSlug: "valorant", title: "Valorant Points", subtitle: "1,000 VP", price: 319, stockCount: 6, image: "/products/valorant-vp-1000.svg" },
-  { slug: "valorant-vp-2050", gameSlug: "valorant", title: "Valorant Points", subtitle: "2,050 VP", price: 639, stockCount: 4, image: "/products/valorant-vp-2050.svg" },
-  { slug: "valorant-vp-3650", gameSlug: "valorant", title: "Valorant Points", subtitle: "3,650 VP", price: 1099, stockCount: 2, image: "/products/valorant-vp-3650.svg" },
-  { slug: "valorant-vp-5350", gameSlug: "valorant", title: "Valorant Points", subtitle: "5,350 VP", price: 1559, stockCount: 1, image: "/products/valorant-vp-5350.svg" },
+  // RoV — คูปอง (coupons). Denominations/pricing modeled on real listings.
+  { slug: "rov-coupon-60", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "60 คูปอง", price: 59, stockCount: 8, image: "/products/rov-coupon-60.svg" },
+  { slug: "rov-coupon-110", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "110 คูปอง", price: 99, stockCount: 8, image: "/products/rov-coupon-110.svg" },
+  { slug: "rov-coupon-185", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "185 คูปอง", price: 169, stockCount: 6, image: "/products/rov-coupon-185.svg" },
+  { slug: "rov-coupon-370", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "370 คูปอง", price: 339, stockCount: 4, image: "/products/rov-coupon-370.svg" },
+  { slug: "rov-coupon-620", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "620 คูปอง", price: 559, stockCount: 4, image: "/products/rov-coupon-620.svg" },
+  { slug: "rov-coupon-1240", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "1,240 คูปอง", price: 1119, stockCount: 1, image: "/products/rov-coupon-1240.svg" },
+
+  // Valorant — Valorant Points
+  { slug: "valorant-vp-475", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "475 VP", price: 159, stockCount: 6, image: "/products/valorant-vp-475.svg" },
+  { slug: "valorant-vp-1000", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "1,000 VP", price: 319, stockCount: 6, image: "/products/valorant-vp-1000.svg" },
+  { slug: "valorant-vp-2050", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "2,050 VP", price: 639, stockCount: 4, image: "/products/valorant-vp-2050.svg" },
+  { slug: "valorant-vp-3650", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "3,650 VP", price: 1099, stockCount: 2, image: "/products/valorant-vp-3650.svg" },
+  { slug: "valorant-vp-5350", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "5,350 VP", price: 1559, stockCount: 1, image: "/products/valorant-vp-5350.svg" },
 ] as const;
 
 const CODE_PREFIX: Record<string, string> = {
   roblox: "RBLX",
-  "blox-fruits": "RBLX",
-  minecraft: "MCRT",
+  "free-fire": "FF",
+  rov: "ROV",
   valorant: "VLRT",
 };
 
@@ -57,10 +79,18 @@ async function main() {
   for (const g of GAMES) {
     const game = await db.game.upsert({
       where: { slug: g.slug },
-      update: { name: g.name, coverImage: g.coverImage },
+      update: { name: g.name, coverImage: g.coverImage, isActive: true },
       create: g,
     });
     gameBySlug.set(g.slug, game.id);
+  }
+
+  console.log("Retiring superseded games...");
+  const retired = await db.game.findMany({ where: { slug: { in: [...RETIRED_GAME_SLUGS] } } });
+  if (retired.length > 0) {
+    const retiredIds = retired.map((g) => g.id);
+    await db.product.updateMany({ where: { gameId: { in: retiredIds } }, data: { isActive: false } });
+    await db.game.updateMany({ where: { id: { in: retiredIds } }, data: { isActive: false } });
   }
 
   console.log("Seeding products + stock...");
@@ -68,12 +98,13 @@ async function main() {
     const gameId = gameBySlug.get(p.gameSlug)!;
     const product = await db.product.upsert({
       where: { slug: p.slug },
-      update: { title: p.title, subtitle: p.subtitle, price: p.price, gameId, image: p.image },
+      update: { title: p.title, subtitle: p.subtitle, category: p.category, price: p.price, gameId, image: p.image, isActive: true },
       create: {
         slug: p.slug,
         gameId,
         title: p.title,
         subtitle: p.subtitle,
+        category: p.category,
         price: p.price,
         image: p.image,
       },

@@ -40,6 +40,7 @@ export const createProductSchema = z.object({
   gameId: z.string().min(1, "กรุณาเลือกเกม"),
   title: z.string().trim().min(2, "กรุณากรอกชื่อสินค้า").max(120),
   subtitle: z.string().trim().max(60).optional().or(z.literal("")),
+  category: z.string().trim().max(60).optional().or(z.literal("")),
   price: z.number().int().min(1, "ราคาต้องมากกว่า 0").max(1_000_000),
   autoDelivery: z.boolean().default(true),
 });
