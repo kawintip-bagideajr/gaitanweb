@@ -12,23 +12,23 @@
     
     <defs>
       <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#b291fb" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="#b291fb" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#45dcf0" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#45dcf0" stop-opacity="0"/>
       </radialGradient>
     </defs>
     <circle cx="400" cy="400" r="270" fill="url(#glow1)"/>
   
-    <circle cx="212.1" cy="450.5" r="2.1" fill="#b291fb" opacity="0.29"/><circle cx="769.4" cy="676.1" r="2.1" fill="#b291fb" opacity="0.70"/><circle cx="177.8" cy="720.7" r="1.7" fill="#b291fb" opacity="0.60"/><circle cx="442.1" cy="515.0" r="3.9" fill="#b291fb" opacity="0.51"/><circle cx="71.0" cy="138.2" r="2.8" fill="#b291fb" opacity="0.62"/><circle cx="654.6" cy="528.4" r="2.3" fill="#b291fb" opacity="0.36"/><circle cx="375.7" cy="727.7" r="1.8" fill="#b291fb" opacity="0.38"/><circle cx="54.0" cy="459.4" r="3.4" fill="#b291fb" opacity="0.30"/><circle cx="124.0" cy="39.8" r="3.3" fill="#b291fb" opacity="0.33"/><circle cx="546.3" cy="21.8" r="2.3" fill="#b291fb" opacity="0.23"/><circle cx="451.8" cy="573.3" r="3.0" fill="#b291fb" opacity="0.57"/><circle cx="719.4" cy="588.2" r="3.9" fill="#b291fb" opacity="0.34"/><circle cx="687.4" cy="530.7" r="2.1" fill="#b291fb" opacity="0.40"/><circle cx="197.7" cy="213.1" r="3.4" fill="#b291fb" opacity="0.27"/><circle cx="574.0" cy="307.0" r="3.4" fill="#b291fb" opacity="0.21"/><circle cx="532.1" cy="387.8" r="3.0" fill="#b291fb" opacity="0.21"/>
+    <circle cx="212.1" cy="450.5" r="2.1" fill="#45dcf0" opacity="0.29"/><circle cx="769.4" cy="676.1" r="2.1" fill="#45dcf0" opacity="0.70"/><circle cx="177.8" cy="720.7" r="1.7" fill="#45dcf0" opacity="0.60"/><circle cx="442.1" cy="515.0" r="3.9" fill="#45dcf0" opacity="0.51"/><circle cx="71.0" cy="138.2" r="2.8" fill="#45dcf0" opacity="0.62"/><circle cx="654.6" cy="528.4" r="2.3" fill="#45dcf0" opacity="0.36"/><circle cx="375.7" cy="727.7" r="1.8" fill="#45dcf0" opacity="0.38"/><circle cx="54.0" cy="459.4" r="3.4" fill="#45dcf0" opacity="0.30"/><circle cx="124.0" cy="39.8" r="3.3" fill="#45dcf0" opacity="0.33"/><circle cx="546.3" cy="21.8" r="2.3" fill="#45dcf0" opacity="0.23"/><circle cx="451.8" cy="573.3" r="3.0" fill="#45dcf0" opacity="0.57"/><circle cx="719.4" cy="588.2" r="3.9" fill="#45dcf0" opacity="0.34"/><circle cx="687.4" cy="530.7" r="2.1" fill="#45dcf0" opacity="0.40"/><circle cx="197.7" cy="213.1" r="3.4" fill="#45dcf0" opacity="0.27"/><circle cx="574.0" cy="307.0" r="3.4" fill="#45dcf0" opacity="0.21"/><circle cx="532.1" cy="387.8" r="3.0" fill="#45dcf0" opacity="0.21"/>
     
     <g transform="translate(400 400)" opacity="0.9">
       <path d="M0 -128.51999999999998 C 141.37199999999999 -128.51999999999998 147.79799999999997 115.66799999999999 0 128.51999999999998 C -147.79799999999997 115.66799999999999 -141.37199999999999 -128.51999999999998 0 -128.51999999999998 Z"
-        fill="#b291fb" opacity="0.85"/>
+        fill="#45dcf0" opacity="0.85"/>
       <path d="M0 -134.946 C 6 -173.50199999999998, 18 -179.92799999999997, 22 -199.206"
-        fill="none" stroke="#b291fb" stroke-width="5" stroke-linecap="round"/>
+        fill="none" stroke="#45dcf0" stroke-width="5" stroke-linecap="round"/>
     </g>
   
     
-    <g opacity="0.5" stroke="#b291fb" stroke-width="2.5" stroke-linecap="round">
+    <g opacity="0.5" stroke="#45dcf0" stroke-width="2.5" stroke-linecap="round">
       <path d="M 594 30 L 770 30 L 770 206" fill="none"/>
       <path d="M 30 594 L 30 770 L 206 770" fill="none"/>
     </g>

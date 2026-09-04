@@ -1,4 +1,4 @@
-import { Layers, Lock, ShieldCheck, Warehouse, Zap } from "lucide-react";
+import { Lock, ShieldCheck, Warehouse, Zap } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
 const TRUST_ITEMS = [

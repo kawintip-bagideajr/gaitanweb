@@ -24,6 +24,14 @@
   --primary-glow: rgba(139, 92, 246, 0.35);
   --primary-foreground: #0a0a0f;
 
+  /* Secondary game-accent hues, used sparingly to break the mono-violet
+     look — per-game colors, gradient CTAs, legendary shimmer. */
+  --accent-pink: #ec4899;
+  --accent-cyan: #22d3ee;
+  --accent-green: #4ade80;
+  --accent-rose: #fb7185;
+  --accent-gold: #fbbf24;
+
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.14);
   --warning: #f5a524;
@@ -56,6 +64,12 @@
   --color-primary-strong: var(--primary-strong);
   --color-primary-soft: var(--primary-soft);
   --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-green: var(--accent-green);
+  --color-accent-rose: var(--accent-rose);
+  --color-accent-gold: var(--accent-gold);
 
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -136,6 +150,57 @@ body {
 /* Ambient violet glow field, used sparingly behind hero / key CTAs */
 .glow-field {
   background: radial-gradient(60% 60% at 50% 30%, var(--primary-glow), transparent 70%);
+}
+
+/* Multi-color glow field — hero background, more energy than a single hue */
+.glow-field-multi {
+  background:
+    radial-gradient(38% 45% at 18% 20%, rgba(139, 92, 246, 0.32), transparent 70%),
+    radial-gradient(32% 40% at 85% 15%, rgba(236, 72, 153, 0.22), transparent 70%),
+    radial-gradient(38% 45% at 75% 85%, rgba(34, 211, 238, 0.18), transparent 70%);
+}
+
+/* Gradient text — headline highlight word */
+.text-gradient {
+  background: linear-gradient(90deg, var(--primary-strong), var(--accent-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Legendary rainbow shimmer border ---------- */
+
+@keyframes rotate-conic {
+  to {
+    --angle: 360deg;
+  }
+}
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.legendary-border {
+  position: relative;
+  z-index: 0;
+}
+.legendary-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  clip-path: polygon(
+    16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px
+  );
+  background: conic-gradient(
+    from var(--angle),
+    var(--accent-gold),
+    var(--accent-pink),
+    var(--primary-strong),
+    var(--accent-cyan),
+    var(--accent-gold)
+  );
+  animation: rotate-conic 3s linear infinite;
 }
 
 /* ---------- Motion ---------- */

@@ -136,11 +136,12 @@ function emblemGem(cx, cy, size, color) {
   `;
 }
 
+// Accent per game matches src/lib/game-theme.ts — keep in sync.
 const GAMES = [
   { file: "roblox.svg", accent: "#8b5cf6", emblem: emblemCubes, seed: 11 },
-  { file: "blox-fruits.svg", accent: "#a78bfa", emblem: emblemBlob, seed: 22 },
-  { file: "minecraft.svg", accent: "#7c6df2", emblem: emblemPixelGrid, seed: 33 },
-  { file: "valorant.svg", accent: "#c4b5fd", emblem: emblemBlade, seed: 44 },
+  { file: "blox-fruits.svg", accent: "#22d3ee", emblem: emblemBlob, seed: 22 },
+  { file: "minecraft.svg", accent: "#4ade80", emblem: emblemPixelGrid, seed: 33 },
+  { file: "valorant.svg", accent: "#fb7185", emblem: emblemBlade, seed: 44 },
 ];
 
 function renderGameCover({ accent, emblem, seed }) {
@@ -164,22 +165,22 @@ const PRODUCTS = [
   { file: "roblox-gift-card-800.svg", accent: "#b7a3fc", scale: 1.0, particleCount: 22, seed: 104 },
   { file: "roblox-gift-card-1700.svg", accent: "#c4b5fd", scale: 1.15, particleCount: 30, seed: 105 },
 
-  { file: "blox-fruits-robux-400.svg", accent: "#a78bfa", scale: 0.75, particleCount: 10, seed: 201, emblem: emblemBlob },
-  { file: "blox-fruits-robux-800.svg", accent: "#b291fb", scale: 0.9, particleCount: 16, seed: 202, emblem: emblemBlob },
-  { file: "blox-fruits-robux-1700.svg", accent: "#bda2fc", scale: 1.0, particleCount: 22, seed: 203, emblem: emblemBlob },
-  { file: "blox-fruits-robux-4500.svg", accent: "#c9b6fd", scale: 1.2, particleCount: 30, seed: 204, emblem: emblemBlob },
+  { file: "blox-fruits-robux-400.svg", accent: "#22d3ee", scale: 0.75, particleCount: 10, seed: 201, emblem: emblemBlob },
+  { file: "blox-fruits-robux-800.svg", accent: "#45dcf0", scale: 0.9, particleCount: 16, seed: 202, emblem: emblemBlob },
+  { file: "blox-fruits-robux-1700.svg", accent: "#6ce4f3", scale: 1.0, particleCount: 22, seed: 203, emblem: emblemBlob },
+  { file: "blox-fruits-robux-4500.svg", accent: "#93ecf6", scale: 1.2, particleCount: 30, seed: 204, emblem: emblemBlob },
 
-  { file: "minecraft-game-key.svg", accent: "#7c6df2", scale: 1.0, particleCount: 18, seed: 301, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-320.svg", accent: "#7c6df2", scale: 0.75, particleCount: 10, seed: 302, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-1020.svg", accent: "#897bf3", scale: 0.9, particleCount: 16, seed: 303, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-1720.svg", accent: "#9689f5", scale: 1.0, particleCount: 22, seed: 304, emblem: emblemPixelGrid },
-  { file: "minecraft-minecoins-3500.svg", accent: "#a397f6", scale: 1.2, particleCount: 30, seed: 305, emblem: emblemPixelGrid },
+  { file: "minecraft-game-key.svg", accent: "#4ade80", scale: 1.0, particleCount: 18, seed: 301, emblem: emblemPixelGrid },
+  { file: "minecraft-minecoins-320.svg", accent: "#4ade80", scale: 0.75, particleCount: 10, seed: 302, emblem: emblemPixelGrid },
+  { file: "minecraft-minecoins-1020.svg", accent: "#69e396", scale: 0.9, particleCount: 16, seed: 303, emblem: emblemPixelGrid },
+  { file: "minecraft-minecoins-1720.svg", accent: "#8fedb2", scale: 1.0, particleCount: 22, seed: 304, emblem: emblemPixelGrid },
+  { file: "minecraft-minecoins-3500.svg", accent: "#b5f5cd", scale: 1.2, particleCount: 30, seed: 305, emblem: emblemPixelGrid },
 
-  { file: "valorant-vp-475.svg", accent: "#c4b5fd", scale: 0.75, particleCount: 10, seed: 401, emblem: emblemBlade },
-  { file: "valorant-vp-1000.svg", accent: "#cabefd", scale: 0.9, particleCount: 16, seed: 402, emblem: emblemBlade },
-  { file: "valorant-vp-2050.svg", accent: "#d1c7fe", scale: 1.0, particleCount: 22, seed: 403, emblem: emblemBlade },
-  { file: "valorant-vp-3650.svg", accent: "#d8d1fe", scale: 1.15, particleCount: 28, seed: 404, emblem: emblemBlade },
-  { file: "valorant-vp-5350.svg", accent: "#dfdbff", scale: 1.3, particleCount: 34, seed: 405, emblem: emblemBlade },
+  { file: "valorant-vp-475.svg", accent: "#fb7185", scale: 0.75, particleCount: 10, seed: 401, emblem: emblemBlade },
+  { file: "valorant-vp-1000.svg", accent: "#fc8b9c", scale: 0.9, particleCount: 16, seed: 402, emblem: emblemBlade },
+  { file: "valorant-vp-2050.svg", accent: "#fda5b3", scale: 1.0, particleCount: 22, seed: 403, emblem: emblemBlade },
+  { file: "valorant-vp-3650.svg", accent: "#fdbfc9", scale: 1.15, particleCount: 28, seed: 404, emblem: emblemBlade },
+  { file: "valorant-vp-5350.svg", accent: "#fed9e0", scale: 1.3, particleCount: 34, seed: 405, emblem: emblemBlade },
 ];
 
 function renderProductCover({ accent, scale, particleCount, seed, emblem = emblemGem }) {
