@@ -15,12 +15,6 @@ const GAMES = [
   { slug: "valorant", name: "Valorant", coverImage: "/games/valorant.svg" },
 ] as const;
 
-// Games that used to be seeded as their own top-level Game but no longer
-// belong there (superseded by a category, or dropped for not matching
-// what people actually top up). Deactivated rather than deleted so any
-// historical orders referencing their products still resolve.
-const RETIRED_GAME_SLUGS = ["blox-fruits", "minecraft"] as const;
-
 const PRODUCTS = [
   // Roblox — general Robux
   { slug: "roblox-gift-card-100", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "100 ROBUX", price: 35, stockCount: 6, image: "/products/roblox-gift-card-100.svg" },
@@ -83,14 +77,6 @@ async function main() {
       create: g,
     });
     gameBySlug.set(g.slug, game.id);
-  }
-
-  console.log("Retiring superseded games...");
-  const retired = await db.game.findMany({ where: { slug: { in: [...RETIRED_GAME_SLUGS] } } });
-  if (retired.length > 0) {
-    const retiredIds = retired.map((g) => g.id);
-    await db.product.updateMany({ where: { gameId: { in: retiredIds } }, data: { isActive: false } });
-    await db.game.updateMany({ where: { id: { in: retiredIds } }, data: { isActive: false } });
   }
 
   console.log("Seeding products + stock...");
