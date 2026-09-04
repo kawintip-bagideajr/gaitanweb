@@ -40,12 +40,12 @@ const PRODUCTS = [
   { slug: "freefire-diamond-3698", gameSlug: "free-fire", category: "เพชร", title: "Free Fire Diamonds", subtitle: "3,698 เพชร", price: 1019, stockCount: 2, image: "/products/freefire-diamond-3698.svg" },
 
   // RoV — คูปอง (coupons). Denominations/pricing modeled on real listings.
-  { slug: "rov-coupon-60", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "60 คูปอง", price: 59, stockCount: 8, image: "/products/rov-coupon-60.svg" },
-  { slug: "rov-coupon-110", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "110 คูปอง", price: 99, stockCount: 8, image: "/products/rov-coupon-110.svg" },
-  { slug: "rov-coupon-185", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "185 คูปอง", price: 169, stockCount: 6, image: "/products/rov-coupon-185.svg" },
-  { slug: "rov-coupon-370", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "370 คูปอง", price: 339, stockCount: 4, image: "/products/rov-coupon-370.svg" },
-  { slug: "rov-coupon-620", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "620 คูปอง", price: 559, stockCount: 4, image: "/products/rov-coupon-620.svg" },
-  { slug: "rov-coupon-1240", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "1,240 คูปอง", price: 1119, stockCount: 1, image: "/products/rov-coupon-1240.svg" },
+  { slug: "rov-coupon-60", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "60 คูปอง", price: 59, stockCount: 8, image: "/products/rov-common.jpg" },
+  { slug: "rov-coupon-110", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "110 คูปอง", price: 99, stockCount: 8, image: "/products/rov-common.jpg" },
+  { slug: "rov-coupon-185", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "185 คูปอง", price: 169, stockCount: 6, image: "/products/rov-rare.jpg" },
+  { slug: "rov-coupon-370", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "370 คูปอง", price: 339, stockCount: 4, image: "/products/rov-rare.jpg" },
+  { slug: "rov-coupon-620", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "620 คูปอง", price: 559, stockCount: 4, image: "/products/rov-epic.jpg" },
+  { slug: "rov-coupon-1240", gameSlug: "rov", category: "คูปอง", title: "RoV Coupons", subtitle: "1,240 คูปอง", price: 1119, stockCount: 1, image: "/products/rov-legendary.jpg" },
 
   // Valorant — Valorant Points
   { slug: "valorant-vp-475", gameSlug: "valorant", category: "Valorant Points", title: "Valorant Points", subtitle: "475 VP", price: 159, stockCount: 6, image: "/products/valorant-vp-475.svg" },
