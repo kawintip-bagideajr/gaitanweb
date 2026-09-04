@@ -70,21 +70,21 @@ export function Hero() {
 function HeroVisual() {
   return (
     <div className="relative hidden aspect-square items-center justify-center lg:flex">
-      <div className="absolute h-72 w-72 rounded-full bg-primary/25 blur-3xl" />
-      <div className="absolute h-48 w-48 -translate-x-24 translate-y-16 rounded-full bg-accent-cyan/20 blur-3xl" />
-      <div className="absolute h-48 w-48 translate-x-28 -translate-y-20 rounded-full bg-accent-pink/20 blur-3xl" />
+      <div className="absolute h-96 w-96 rounded-full bg-primary/25 blur-3xl" />
+      <div className="absolute h-56 w-56 -translate-x-28 translate-y-20 rounded-full bg-accent-cyan/20 blur-3xl" />
+      <div className="absolute h-56 w-56 translate-x-32 -translate-y-24 rounded-full bg-accent-pink/20 blur-3xl" />
 
       {/* Central logo — real transparent PNG, floating with a pulsing
           glow. No frame needed; the ambient blur blobs behind show
           straight through the transparent background. */}
-      <div className="animate-float relative flex h-72 w-72 items-center justify-center">
+      <div className="animate-float relative flex h-[26rem] w-[26rem] items-center justify-center">
         <Image
           src="/logo-xelvex.png"
           alt="Xelvex — Level Up Your Game"
           width={500}
           height={500}
           priority
-          className="animate-drop-glow-pulse h-64 w-64 object-contain"
+          className="animate-drop-glow-pulse h-full w-full object-contain"
         />
       </div>
 
