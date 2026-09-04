@@ -20,10 +20,14 @@ export async function POST(req: NextRequest) {
 
   if (user) {
     const token = await createPasswordResetToken(user.id, user.passwordHash);
-    // No email provider is wired up yet, so the reset link is handed
-    // back directly instead of being sent — this field must be
-    // removed the moment a real mailer is in place.
-    response.devResetLink = `/reset-password?token=${encodeURIComponent(token)}`;
+    // No email provider is wired up yet. In production this token MUST
+    // NOT be handed back in the API response — that would let anyone
+    // reset any account's password just by knowing their email. Only
+    // expose it in non-production so local dev still has a way to test
+    // the flow without a real mailer.
+    if (process.env.NODE_ENV !== "production") {
+      response.devResetLink = `/reset-password?token=${encodeURIComponent(token)}`;
+    }
   }
 
   return NextResponse.json(response);

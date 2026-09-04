@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { hashPassword, createSession } from "@/lib/auth";
 import { registerSchema } from "@/lib/validation";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const limitResult = rateLimit(`register:${getClientIp(req)}`, 10, 10 * 60 * 1000);
+  if (!limitResult.ok) {
+    return NextResponse.json(
+      { error: "สมัครสมาชิกบ่อยเกินไป กรุณาลองใหม่ภายหลัง" },
+      { status: 429, headers: { "Retry-After": String(limitResult.retryAfterSeconds) } }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
