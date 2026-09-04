@@ -30,9 +30,9 @@ export function Hero() {
           </span>
 
           <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            เติมเกมง่าย
+            อัพเลเวลบัญชีเกม
             <br />
-            รับสินค้ารวดเร็ว
+            <span className="text-primary-strong">ไวในไม่กี่วินาที</span>
           </h1>
 
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted">

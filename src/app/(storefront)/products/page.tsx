@@ -2,8 +2,9 @@ import Link from "next/link";
 import { PackageSearch, Search } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
 import { ProductCard } from "@/components/marketplace/ProductCard";
-import { cn } from "@/lib/utils";
+import { cn, TIER_STYLES } from "@/lib/utils";
 import { getAllProducts, getGames } from "@/lib/queries";
 
 export default async function ProductsPage({
@@ -34,6 +35,15 @@ export default async function ProductsPage({
           </form>
           <span className="text-sm text-muted">{products.length} รายการ</span>
         </div>
+      </div>
+
+      <div className="mb-8 flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-2">ระดับสินค้า:</span>
+        {Object.values(TIER_STYLES).map((t) => (
+          <Badge key={t.label} tone={t.badgeTone} className="font-bold tracking-wider">
+            {t.label}
+          </Badge>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">

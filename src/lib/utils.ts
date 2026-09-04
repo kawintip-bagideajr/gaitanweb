@@ -21,3 +21,31 @@ export function formatDateTH(date: Date | string) {
     timeStyle: "short",
   }).format(d);
 }
+
+export type ProductTier = "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
+
+/**
+ * Purely cosmetic price-band label (loot-rarity style) — never affects
+ * price/stock logic, just how a product card is styled.
+ */
+export function getProductTier(price: number): ProductTier {
+  if (price >= 800) return "LEGENDARY";
+  if (price >= 400) return "EPIC";
+  if (price >= 150) return "RARE";
+  return "COMMON";
+}
+
+export const TIER_STYLES: Record<
+  ProductTier,
+  { label: string; badgeTone: "neutral" | "info" | "primary" | "warning"; barColor: string; ring: string }
+> = {
+  COMMON: { label: "COMMON", badgeTone: "neutral", barColor: "bg-muted-2", ring: "" },
+  RARE: { label: "RARE", badgeTone: "info", barColor: "bg-info", ring: "" },
+  EPIC: { label: "EPIC", badgeTone: "primary", barColor: "bg-primary", ring: "" },
+  LEGENDARY: {
+    label: "LEGENDARY",
+    badgeTone: "warning",
+    barColor: "bg-warning",
+    ring: "shadow-[0_0_20px_-4px_var(--warning)]",
+  },
+};

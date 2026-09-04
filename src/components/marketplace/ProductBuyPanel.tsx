@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Minus, Plus, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { formatTHB } from "@/lib/utils";
+import { formatTHB, getProductTier, TIER_STYLES } from "@/lib/utils";
 import { useCart } from "@/lib/cart-store";
 import type { Product } from "@/types";
 
@@ -14,13 +14,19 @@ export function ProductBuyPanel({ product }: { product: Product }) {
   const { addItem } = useCart();
   const router = useRouter();
   const inStock = product.stockCount > 0;
+  const tierStyle = TIER_STYLES[getProductTier(product.price)];
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-2">
-          {product.gameName}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-2">
+            {product.gameName}
+          </span>
+          <Badge tone={tierStyle.badgeTone} className="font-bold tracking-wider">
+            {tierStyle.label}
+          </Badge>
+        </div>
         <h1 className="mt-1 text-2xl font-bold text-foreground">{product.title}</h1>
         {product.subtitle && (
           <p className="mt-1 text-lg font-medium text-primary-soft">{product.subtitle}</p>
