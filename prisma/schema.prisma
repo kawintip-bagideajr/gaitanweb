@@ -226,7 +226,7 @@ model AuditLog {
 // from /admin/settings.
 model StoreSetting {
   id           String   @id @default("default")
-  storeName    String   @default("{{STORE_NAME}}")
+  storeName    String   @default("Xelvex")
   supportEmail String?
   discordUrl   String?
   updatedAt    DateTime @updatedAt

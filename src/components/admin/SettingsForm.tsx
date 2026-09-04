@@ -49,7 +49,7 @@ export function SettingsForm({ initial }: { initial: SettingsValues }) {
           label="ชื่อร้าน"
           value={values.storeName}
           onChange={(e) => setValues((v) => ({ ...v, storeName: e.target.value }))}
-          placeholder="{{STORE_NAME}}"
+          placeholder="Xelvex"
           required
         />
         <Input

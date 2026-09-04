@@ -1,9 +1,9 @@
 /**
- * Single source of truth for brand placeholder.
- * Swap STORE_NAME here when the real brand name is decided —
- * nothing else in the codebase should hardcode a name.
+ * Single source of truth for the brand name.
+ * Swap STORE_NAME here to rename the store — nothing else in the
+ * codebase should hardcode a name.
  */
-export const STORE_NAME = "{{STORE_NAME}}";
+export const STORE_NAME = "Xelvex";
 
 export const SITE_CONFIG = {
   name: STORE_NAME,
