@@ -16,8 +16,9 @@
         <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <circle cx="400" cy="400" r="210" fill="url(#glow1)"/>
+    <circle cx="400" cy="400" r="251.99999999999997" fill="url(#glow1)"/>
   
+    <g opacity="0.4" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"><line x1="471.6" y1="403.3" x2="607.0" y2="409.7" opacity="0.30"/><line x1="457.5" y1="442.8" x2="590.7" y2="542.0" opacity="0.63"/><line x1="428.8" y1="465.6" x2="492.1" y2="609.7" opacity="0.45"/><line x1="390.7" y1="471.1" x2="372.4" y2="611.7" opacity="0.45"/><line x1="362.2" y1="460.9" x2="282.0" y2="590.3" opacity="0.36"/><line x1="332.8" y1="424.9" x2="198.8" y2="474.6" opacity="0.38"/><line x1="329.1" y1="389.6" x2="184.2" y2="368.5" opacity="0.72"/><line x1="340.4" y1="360.2" x2="243.0" y2="295.0" opacity="0.58"/><line x1="366.3" y1="336.7" x2="288.3" y2="190.1" opacity="0.68"/><line x1="411.1" y1="329.2" x2="437.2" y2="162.1" opacity="0.72"/><line x1="437.8" y1="339.1" x2="521.7" y2="204.2" opacity="0.42"/><line x1="462.8" y1="365.4" x2="610.0" y2="284.4" opacity="0.47"/></g>
     <circle cx="149.2" cy="400.1" r="1.8" fill="#38bdf8" opacity="0.43"/><circle cx="712.2" cy="611.7" r="2.6" fill="#38bdf8" opacity="0.59"/><circle cx="314.0" cy="415.1" r="3.0" fill="#38bdf8" opacity="0.40"/><circle cx="100.1" cy="570.8" r="2.1" fill="#38bdf8" opacity="0.54"/><circle cx="475.5" cy="209.6" r="3.0" fill="#38bdf8" opacity="0.52"/><circle cx="748.8" cy="210.5" r="2.2" fill="#38bdf8" opacity="0.53"/><circle cx="110.2" cy="711.8" r="3.7" fill="#38bdf8" opacity="0.51"/><circle cx="742.4" cy="755.5" r="1.8" fill="#38bdf8" opacity="0.60"/>
     
     <g transform="translate(400 400)" opacity="0.95">

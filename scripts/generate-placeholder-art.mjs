@@ -43,6 +43,53 @@ function xAccent(w, h, color) {
   `;
 }
 
+function rays(cx, cy, count, len, color, seed) {
+  let s = seed;
+  const rand = () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+  let out = `<g opacity="0.4" stroke="${color}" stroke-width="2" stroke-linecap="round">`;
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + rand() * 0.25;
+    const r1 = len * 0.32;
+    const r2 = len * (0.75 + rand() * 0.35);
+    const x1 = cx + Math.cos(angle) * r1;
+    const y1 = cy + Math.sin(angle) * r1;
+    const x2 = cx + Math.cos(angle) * r2;
+    const y2 = cy + Math.sin(angle) * r2;
+    out += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" opacity="${(0.25 + rand() * 0.5).toFixed(2)}"/>`;
+  }
+  out += "</g>";
+  return out;
+}
+
+function energySlashes(w, h, color, seed, id) {
+  // Bold diagonal action-lines, like an impact/power-up flash.
+  let s = seed;
+  const rand = () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+  let out = `
+    <defs>
+      <linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0"/>
+        <stop offset="50%" stop-color="${color}" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g>
+  `;
+  for (let i = 0; i < 4; i++) {
+    const yOff = h * (0.08 + i * 0.26) + rand() * 30;
+    const barH = 10 + rand() * 16;
+    out += `<rect x="${-w * 0.25}" y="${yOff.toFixed(1)}" width="${(w * 1.5).toFixed(1)}" height="${barH.toFixed(1)}" fill="url(#${id})" transform="rotate(-16 ${w / 2} ${yOff.toFixed(1)})"/>`;
+  }
+  out += "</g>";
+  return out;
+}
+
 function particles(w, h, color, count, seed) {
   let out = "";
   let s = seed;
@@ -129,10 +176,13 @@ function renderGameCover({ accent, emblem, seed }) {
   const w = 800, h = 1000;
   const inner = `
     ${grid(w, h, "grid")}
-    ${glow(w * 0.75, h * 0.25, 420, accent, "glow1")}
-    ${glow(w * 0.2, h * 0.85, 320, accent, "glow2")}
-    ${particles(w, h, accent, 22, seed)}
-    ${emblem(w / 2, h * 0.42, 340, accent)}
+    ${energySlashes(w, h, accent, seed, `slash${seed}`)}
+    ${glow(w * 0.5, h * 0.42, 520, accent, "glow0")}
+    ${glow(w * 0.75, h * 0.2, 380, accent, "glow1")}
+    ${glow(w * 0.15, h * 0.85, 320, accent, "glow2")}
+    ${rays(w / 2, h * 0.42, 16, 420, accent, seed)}
+    ${particles(w, h, accent, 34, seed)}
+    ${emblem(w / 2, h * 0.42, 400, accent)}
     ${xAccent(w, h, accent)}
     <rect x="1" y="1" width="${w - 2}" height="${h - 2}" fill="none" stroke="${BORDER}" stroke-width="2"/>
   `;
@@ -181,7 +231,8 @@ function renderProductCover({ accent, scale, particleCount, seed, emblem = emble
   const w = 800, h = 800;
   const inner = `
     ${grid(w, h, "grid")}
-    ${glow(w / 2, h / 2, 300 * scale, accent, "glow1")}
+    ${glow(w / 2, h / 2, 360 * scale, accent, "glow1")}
+    ${rays(w / 2, h / 2, 12, 320 * scale, accent, seed)}
     ${particles(w, h, accent, particleCount, seed)}
     ${emblem(w / 2, h / 2, 340 * scale, accent)}
     ${xAccent(w, h, accent)}
