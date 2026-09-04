@@ -18,10 +18,10 @@
   --muted: #a0a0ad;
   --muted-2: #6b6b78;
 
-  --primary: #8b5cf6;
-  --primary-strong: #a78bfa;
-  --primary-soft: #c4b5fd;
-  --primary-glow: rgba(139, 92, 246, 0.35);
+  --primary: #7c3aed;
+  --primary-strong: #9d5ff0;
+  --primary-soft: #c08afc;
+  --primary-glow: rgba(124, 58, 237, 0.35);
   --primary-foreground: #0a0a0f;
 
   /* Secondary game-accent hues, used sparingly to break the mono-violet

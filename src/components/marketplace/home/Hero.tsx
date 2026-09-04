@@ -75,8 +75,17 @@ function HeroVisual() {
 
       {/* Central X emblem */}
       <div className="clip-x-lg corner-brackets relative flex h-64 w-64 items-center justify-center border border-border-strong bg-surface/60 backdrop-blur">
-        <svg viewBox="0 0 24 24" className="h-20 w-20 text-primary-strong" fill="none" stroke="currentColor" strokeWidth={1.5}>
-          <path d="M5 5L19 19M19 5L5 19" strokeLinecap="round" />
+        <svg viewBox="0 0 32 32" className="h-24 w-24 drop-shadow-[0_0_24px_rgba(139,92,246,0.6)]">
+          <defs>
+            <radialGradient id="heroXmark" cx="16" cy="16" r="19" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="var(--primary)" />
+              <stop offset="100%" stopColor="var(--primary-soft)" />
+            </radialGradient>
+          </defs>
+          <polygon points="16,16 28,4 25,10" fill="url(#heroXmark)" />
+          <polygon points="16,16 4,4 7,10" fill="url(#heroXmark)" />
+          <polygon points="16,16 4,28 7,22" fill="url(#heroXmark)" />
+          <polygon points="16,16 28,28 25,22" fill="url(#heroXmark)" />
         </svg>
       </div>
 

@@ -7,7 +7,7 @@ export const STORE_NAME = "Xelvex";
 
 export const SITE_CONFIG = {
   name: STORE_NAME,
-  tagline: "DIGITAL GAMING MARKETPLACE",
+  tagline: "LEVEL UP YOUR GAME",
   description:
     "จำหน่ายสินค้าดิจิทัลสำหรับเกม พร้อมระบบจัดส่งอัตโนมัติและการจัดการคำสั่งซื้อที่ปลอดภัย",
   nav: [

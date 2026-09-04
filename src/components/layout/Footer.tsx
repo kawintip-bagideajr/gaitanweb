@@ -2,6 +2,16 @@ import Link from "next/link";
 import { Logo } from "./Logo";
 import { SITE_CONFIG, STORE_NAME } from "@/lib/site-config";
 
+// Text-only, colored to each game's brand family — deliberately NOT the
+// official logos (no partnership with these publishers), just enough for
+// a visitor to recognize the game at a glance.
+const SUPPORTED_GAMES = [
+  { label: "ROBLOX", color: "#8b5cf6" },
+  { label: "FREE FIRE", color: "#f97316" },
+  { label: "ROV", color: "#38bdf8" },
+  { label: "VALORANT", color: "#fb7185" },
+];
+
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-border bg-surface">
@@ -10,6 +20,17 @@ export function Footer() {
           <div className="col-span-2 flex flex-col gap-3 sm:col-span-1">
             <Logo />
             <p className="max-w-xs text-sm text-muted">{SITE_CONFIG.description}</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {SUPPORTED_GAMES.map((g) => (
+                <span
+                  key={g.label}
+                  className="clip-x-sm border px-2 py-1 text-[10px] font-bold tracking-wider"
+                  style={{ borderColor: `${g.color}40`, color: g.color, background: `${g.color}14` }}
+                >
+                  {g.label}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div>
