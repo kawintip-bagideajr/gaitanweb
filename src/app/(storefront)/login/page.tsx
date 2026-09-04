@@ -51,7 +51,12 @@ function LoginForm() {
       return;
     }
 
-    router.push(next);
+    const user = await res.json().catch(() => null);
+    // No explicit destination was requested — admins land on the admin
+    // panel instead of the storefront home page.
+    const destination = next === "/" && user?.role === "ADMIN" ? "/admin" : next;
+
+    router.push(destination);
     router.refresh();
   }
 
@@ -80,9 +85,6 @@ function LoginForm() {
         <Button type="submit" className="w-full" size="lg" disabled={submitting}>
           {submitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
         </Button>
-        <p className="text-center text-xs text-muted-2">
-          Demo: customer@example.com / customer1234
-        </p>
       </form>
     </AuthCard>
   );
