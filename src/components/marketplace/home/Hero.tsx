@@ -74,19 +74,18 @@ function HeroVisual() {
       <div className="absolute h-48 w-48 -translate-x-24 translate-y-16 rounded-full bg-accent-cyan/20 blur-3xl" />
       <div className="absolute h-48 w-48 translate-x-28 -translate-y-20 rounded-full bg-accent-pink/20 blur-3xl" />
 
-      {/* Central logo — floating, framed, full sharpness (no filters on
-          the image itself; the pulsing glow lives on the frame). */}
+      {/* Central logo — real transparent PNG, floating with a pulsing
+          glow. No frame needed; the ambient blur blobs behind show
+          straight through the transparent background. */}
       <div className="animate-float relative flex h-72 w-72 items-center justify-center">
-        <div className="clip-x-lg corner-brackets animate-glow-pulse relative flex h-64 w-64 items-center justify-center overflow-hidden border border-primary/30 bg-surface/60 backdrop-blur">
-          <Image
-            src="/logo-xelvex.png"
-            alt="Xelvex — Level Up Your Game"
-            fill
-            sizes="256px"
-            priority
-            className="scale-110 object-cover"
-          />
-        </div>
+        <Image
+          src="/logo-xelvex.png"
+          alt="Xelvex — Level Up Your Game"
+          width={500}
+          height={500}
+          priority
+          className="animate-drop-glow-pulse h-64 w-64 object-contain"
+        />
       </div>
 
       {/* Floating product cards, one per game color */}

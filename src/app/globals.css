@@ -218,20 +218,20 @@ body {
   animation: float 4.5s ease-in-out infinite;
 }
 
-/* Pulsing glow lives on the frame around the logo (box-shadow), not on
-   the image itself — no filter is applied to the image, so it renders
-   at full original sharpness. */
-@keyframes glow-pulse {
+/* drop-shadow only (no other filter stacked on it), safe on the real
+   transparent logo PNG — glows around the actual art, not a bounding
+   box, since there's no opaque background left to cast a square shadow. */
+@keyframes drop-glow-pulse {
   0%,
   100% {
-    box-shadow: 0 0 28px -6px var(--primary-glow);
+    filter: drop-shadow(0 0 22px rgba(124, 58, 237, 0.6));
   }
   50% {
-    box-shadow: 0 0 50px -4px var(--primary-glow);
+    filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.9));
   }
 }
-.animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
+.animate-drop-glow-pulse {
+  animation: drop-glow-pulse 3s ease-in-out infinite;
 }
 
 @keyframes spin-x {
