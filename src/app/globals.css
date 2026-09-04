@@ -203,6 +203,12 @@ body {
   animation: rotate-conic 3s linear infinite;
 }
 
+/* Turns black background transparent on logo art with no alpha channel
+   — see the <filter id="logo-cutout-filter"> in the root layout. */
+.logo-cutout {
+  filter: url(#logo-cutout-filter);
+}
+
 /* ---------- Motion ---------- */
 
 @keyframes float {
@@ -218,13 +224,17 @@ body {
   animation: float 4.5s ease-in-out infinite;
 }
 
+/* `filter` doesn't merge across rules — this keyframe carries the
+   logo-cutout url() filter alongside drop-shadow so both apply
+   throughout the animation (used together with .logo-cutout,  whose
+   filter would otherwise be fully replaced by these keyframes). */
 @keyframes glow-pulse {
   0%,
   100% {
-    filter: drop-shadow(0 0 24px rgba(124, 58, 237, 0.55));
+    filter: url(#logo-cutout-filter) drop-shadow(0 0 24px rgba(124, 58, 237, 0.55));
   }
   50% {
-    filter: drop-shadow(0 0 44px rgba(124, 58, 237, 0.85));
+    filter: url(#logo-cutout-filter) drop-shadow(0 0 44px rgba(124, 58, 237, 0.85));
   }
 }
 .animate-glow-pulse {

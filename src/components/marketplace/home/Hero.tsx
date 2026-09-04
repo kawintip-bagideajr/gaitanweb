@@ -82,7 +82,7 @@ function HeroVisual() {
           width={607}
           height={607}
           priority
-          className="animate-glow-pulse h-64 w-64 object-contain mix-blend-screen"
+          className="animate-glow-pulse h-64 w-64 object-contain"
         />
       </div>
 
