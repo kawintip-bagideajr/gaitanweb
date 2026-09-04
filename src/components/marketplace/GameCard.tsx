@@ -32,15 +32,19 @@ export function GameCard({ game }: { game: Game }) {
             <Gamepad2 className="h-10 w-10" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        <div
+          className="pointer-events-none absolute -bottom-6 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full opacity-60 blur-3xl"
+          style={{ background: theme.accent }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent" />
         <div
           className="absolute inset-x-0 top-0 h-1"
           style={{ background: theme.gradient }}
         />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
           <div>
-            <h3 className="text-base font-semibold text-foreground">{game.name}</h3>
-            <p className="text-xs text-muted">{game.productCount} สินค้า</p>
+            <h3 className="text-lg font-extrabold tracking-tight text-foreground">{game.name}</h3>
+            <p className="text-xs font-medium text-muted">{game.productCount} สินค้า</p>
           </div>
           <div
             className="clip-x-sm flex h-9 w-9 items-center justify-center border bg-surface/80 text-muted transition-colors group-hover:text-[var(--game-accent)]"

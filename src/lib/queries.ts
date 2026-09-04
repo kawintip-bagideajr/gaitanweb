@@ -60,6 +60,22 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return toProduct(product);
 }
 
+export interface StoreStats {
+  gameCount: number;
+  productCount: number;
+  stockAvailableCount: number;
+}
+
+/** Real, live counts — never fabricated marketing numbers. */
+export async function getStoreStats(): Promise<StoreStats> {
+  const [gameCount, productCount, stockAvailableCount] = await Promise.all([
+    db.game.count({ where: { isActive: true } }),
+    db.product.count({ where: { isActive: true } }),
+    db.stockItem.count({ where: { status: "AVAILABLE" } }),
+  ]);
+  return { gameCount, productCount, stockAvailableCount };
+}
+
 export async function getGames(): Promise<Game[]> {
   const games = await db.game.findMany({
     where: { isActive: true },
