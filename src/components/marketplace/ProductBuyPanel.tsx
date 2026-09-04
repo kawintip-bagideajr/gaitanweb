@@ -6,6 +6,7 @@ import { Minus, Plus, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { formatTHB, getProductTier, TIER_STYLES } from "@/lib/utils";
+import { getGameTheme } from "@/lib/game-theme";
 import { useCart } from "@/lib/cart-store";
 import type { Product } from "@/types";
 
@@ -14,7 +15,9 @@ export function ProductBuyPanel({ product }: { product: Product }) {
   const { addItem } = useCart();
   const router = useRouter();
   const inStock = product.stockCount > 0;
-  const tierStyle = TIER_STYLES[getProductTier(product.price)];
+  const tier = getProductTier(product.price);
+  const tierStyle = TIER_STYLES[tier];
+  const theme = getGameTheme(product.category ?? product.gameName);
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,7 +39,12 @@ export function ProductBuyPanel({ product }: { product: Product }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-3xl font-extrabold text-foreground">{formatTHB(product.price)}</span>
+        <span
+          className="text-3xl font-extrabold"
+          style={{ color: tier === "LEGENDARY" ? "var(--accent-gold)" : theme.accent }}
+        >
+          {formatTHB(product.price)}
+        </span>
         <Badge tone={inStock ? "success" : "neutral"}>
           {inStock ? "● พร้อมส่ง" : "● หมดสต๊อก"}
         </Badge>

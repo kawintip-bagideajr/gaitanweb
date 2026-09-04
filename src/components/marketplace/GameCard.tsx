@@ -12,12 +12,12 @@ export function GameCard({ game }: { game: Game }) {
     <Link href={`/games/${game.slug}`} className="block">
       <Card
         brackets
-        className="group relative aspect-[4/5] overflow-hidden transition-all duration-300 hover:-translate-y-1"
-        style={{ boxShadow: `0 0 0 1px var(--border)` }}
+        className="group relative aspect-[4/5] overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
+        style={{ boxShadow: `0 0 0 1px ${theme.accent}55` }}
       >
         <div
-          className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ boxShadow: `0 0 32px -6px ${theme.glow}, inset 0 0 0 1px ${theme.accent}55` }}
+          className="pointer-events-none absolute -inset-px opacity-50 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ boxShadow: `0 0 32px -6px ${theme.glow}, inset 0 0 0 1px ${theme.accent}80` }}
         />
         {game.coverImage ? (
           <Image
@@ -43,8 +43,10 @@ export function GameCard({ game }: { game: Game }) {
         />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
           <div>
-            <h3 className="text-lg font-extrabold tracking-tight text-foreground">{game.name}</h3>
-            <p className="text-xs font-medium text-muted">{game.productCount} สินค้า</p>
+            <h3 className="text-xl font-extrabold tracking-tight text-foreground">{game.name}</h3>
+            <p className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
+              {game.productCount} สินค้า
+            </p>
           </div>
           <div
             className="clip-x-sm flex h-9 w-9 items-center justify-center border bg-surface/80 text-muted transition-colors group-hover:text-[var(--game-accent)]"

@@ -30,18 +30,22 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div
       className={cn(
-        "group relative transition-transform duration-300 hover:-translate-y-1",
+        "group relative transition-transform duration-300 hover:-translate-y-1.5",
         isLegendary && "legendary-border"
       )}
       style={!isLegendary ? ({ "--game-glow": theme.glow } as React.CSSProperties) : undefined}
     >
       {!isLegendary && (
         <div
-          className="pointer-events-none absolute -inset-2 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-2 opacity-40 blur-md transition-opacity duration-300 group-hover:opacity-90"
           style={{ background: "var(--game-glow)" }}
         />
       )}
-      <Card brackets className="relative flex flex-col overflow-hidden">
+      <Card
+        brackets
+        className="relative flex flex-col overflow-hidden"
+        style={!isLegendary ? { boxShadow: `0 0 0 1px ${theme.accent}55` } : undefined}
+      >
         <Link href={`/products/${product.slug}`} className="flex flex-1 flex-col">
           <div className="relative aspect-square w-full overflow-hidden bg-surface-2">
             {product.image ? (
@@ -80,28 +84,36 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
 
           <div className="flex flex-1 flex-col gap-1 p-4">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-2">
+            <span
+              className="text-xs font-bold uppercase tracking-wide"
+              style={{ color: theme.accent }}
+            >
               {product.category ?? product.gameName}
             </span>
-            <h3 className="text-sm font-semibold text-foreground">{product.title}</h3>
+            <h3 className="text-base font-bold text-foreground">{product.title}</h3>
             {product.subtitle && (
-              <p className="text-sm text-primary-soft">{product.subtitle}</p>
+              <p className="text-sm font-medium text-primary-soft">{product.subtitle}</p>
             )}
           </div>
         </Link>
 
-        <div className="flex items-center justify-between gap-3 border-t border-border p-4">
-          <span className="text-lg font-bold text-foreground">{formatTHB(product.price)}</span>
+        <div className="flex flex-col gap-2.5 border-t border-border p-4">
+          <span
+            className="text-2xl font-extrabold tracking-tight"
+            style={{ color: isLegendary ? "var(--accent-gold)" : theme.accent }}
+          >
+            {formatTHB(product.price)}
+          </span>
           <Button
-            size="sm"
+            size="md"
             disabled={!inStock}
-            className={cn(!inStock && "cursor-not-allowed")}
+            className={cn("w-full", !inStock && "cursor-not-allowed")}
             onClick={() => {
               addItem(product, 1);
               router.push("/cart");
             }}
           >
-            {inStock ? "ซื้อเลย" : "หมด"}
+            {inStock ? "ซื้อเลย" : "สินค้าหมด"}
           </Button>
         </div>
       </Card>

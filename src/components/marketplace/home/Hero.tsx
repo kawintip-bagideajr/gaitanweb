@@ -29,7 +29,7 @@ export function Hero() {
             {SITE_CONFIG.tagline}
           </span>
 
-          <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             อัพเลเวลบัญชีเกม
             <br />
             <span className="text-gradient">ไวในไม่กี่วินาที</span>
