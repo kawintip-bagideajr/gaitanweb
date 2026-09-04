@@ -17,11 +17,11 @@ const GAMES = [
 
 const PRODUCTS = [
   // Roblox — general Robux
-  { slug: "roblox-gift-card-100", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "100 ROBUX", price: 35, stockCount: 6, image: "/products/roblox-gift-card-100.svg" },
-  { slug: "roblox-gift-card-250", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "250 ROBUX", price: 85, stockCount: 6, image: "/products/roblox-gift-card-250.svg" },
-  { slug: "roblox-gift-card-500", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "500 ROBUX", price: 160, stockCount: 6, image: "/products/roblox-gift-card-500.svg" },
-  { slug: "roblox-gift-card-800", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "800 ROBUX", price: 255, stockCount: 4, image: "/products/roblox-gift-card-800.svg" },
-  { slug: "roblox-gift-card-1700", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "1700 ROBUX", price: 485, stockCount: 2, image: "/products/roblox-gift-card-1700.svg" },
+  { slug: "roblox-gift-card-100", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "100 ROBUX", price: 35, stockCount: 6, image: "/products/roblox-common.jpg" },
+  { slug: "roblox-gift-card-250", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "250 ROBUX", price: 85, stockCount: 6, image: "/products/roblox-common.jpg" },
+  { slug: "roblox-gift-card-500", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "500 ROBUX", price: 160, stockCount: 6, image: "/products/roblox-rare.jpg" },
+  { slug: "roblox-gift-card-800", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "800 ROBUX", price: 255, stockCount: 4, image: "/products/roblox-rare.jpg" },
+  { slug: "roblox-gift-card-1700", gameSlug: "roblox", category: "Robux", title: "Roblox Gift Card", subtitle: "1700 ROBUX", price: 485, stockCount: 2, image: "/products/roblox-epic.jpg" },
 
   // Roblox — "Blox Fruits" category (still Robux under the hood, just
   // packaged/labeled for Blox Fruits players specifically).
