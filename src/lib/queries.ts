@@ -2,6 +2,7 @@ import "server-only";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { Game, OrderStatus, Product } from "@/types";
+import { TIER_PRICE_RANGES, type ProductTier } from "@/lib/utils";
 
 const productInclude = {
   game: { select: { name: true } },
@@ -38,17 +39,53 @@ export async function getFeaturedProducts(limit = 5): Promise<Product[]> {
   return products.map(toProduct);
 }
 
-export async function getAllProducts(gameSlug?: string, q?: string): Promise<Product[]> {
+export interface ProductFilters {
+  gameSlug?: string;
+  q?: string;
+  category?: string;
+  tier?: ProductTier;
+  sort?: "price_asc" | "price_desc";
+}
+
+export async function getAllProducts(filters: ProductFilters = {}): Promise<Product[]> {
+  const { gameSlug, q, category, tier, sort } = filters;
+  const trimmedQ = q?.trim();
+  // Typing a tier name (e.g. "legendary") searches by its price band too,
+  // so users can find "the expensive Roblox stuff" without knowing prices.
+  const qAsTier = trimmedQ ? TIER_PRICE_RANGES[trimmedQ.toUpperCase() as ProductTier] : undefined;
+
   const products = await db.product.findMany({
     where: {
       isActive: true,
       ...(gameSlug ? { game: { slug: gameSlug } } : {}),
-      ...(q ? { title: { contains: q } } : {}),
+      ...(category ? { category } : {}),
+      ...(tier ? { price: { gte: TIER_PRICE_RANGES[tier].min, lt: TIER_PRICE_RANGES[tier].max } } : {}),
+      ...(trimmedQ
+        ? {
+            OR: [
+              { title: { contains: trimmedQ, mode: "insensitive" } },
+              { subtitle: { contains: trimmedQ, mode: "insensitive" } },
+              { category: { contains: trimmedQ, mode: "insensitive" } },
+              { game: { name: { contains: trimmedQ, mode: "insensitive" } } },
+              ...(qAsTier ? [{ price: { gte: qAsTier.min, lt: qAsTier.max } }] : []),
+            ],
+          }
+        : {}),
     },
     include: productInclude,
-    orderBy: { sortOrder: "asc" },
+    orderBy: sort === "price_asc" ? { price: "asc" } : sort === "price_desc" ? { price: "desc" } : { sortOrder: "asc" },
   });
   return products.map(toProduct);
+}
+
+/** Distinct category labels among active products, optionally scoped to one game. */
+export async function getProductCategories(gameSlug?: string): Promise<string[]> {
+  const rows = await db.product.findMany({
+    where: { isActive: true, category: { not: null }, ...(gameSlug ? { game: { slug: gameSlug } } : {}) },
+    select: { category: true },
+    distinct: ["category"],
+  });
+  return rows.map((r) => r.category!).sort();
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {

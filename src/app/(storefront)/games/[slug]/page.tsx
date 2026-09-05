@@ -30,7 +30,7 @@ export default async function GameDetailPage({
   const game = await getGameBySlug(slug);
   if (!game) notFound();
 
-  const products = await getAllProducts(slug);
+  const products = await getAllProducts({ gameSlug: slug });
   const categories = groupByCategory(products);
 
   return (

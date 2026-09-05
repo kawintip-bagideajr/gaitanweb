@@ -35,6 +35,15 @@ export function getProductTier(price: number): ProductTier {
   return "COMMON";
 }
 
+/** Inclusive/exclusive price bounds matching getProductTier's bands — the
+ * shared source for both the cosmetic badges and the price-tier filter. */
+export const TIER_PRICE_RANGES: Record<ProductTier, { min: number; max?: number }> = {
+  COMMON: { min: 0, max: 150 },
+  RARE: { min: 150, max: 400 },
+  EPIC: { min: 400, max: 800 },
+  LEGENDARY: { min: 800 },
+};
+
 export const TIER_STYLES: Record<
   ProductTier,
   { label: string; badgeTone: "neutral" | "info" | "primary" | "warning"; barColor: string; ring: string }
