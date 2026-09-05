@@ -67,8 +67,8 @@ function LoginForm() {
 
   return (
     <AuthCard
-      title="เข้าสู่ระบบ"
-      subtitle="ยินดีต้อนรับกลับมา"
+      title="กรุณาเข้าสู่ระบบ"
+      subtitle="เข้าสู่ระบบเพื่อใช้บริการของเรา"
       footer={
         <>
           ยังไม่มีบัญชี?{" "}
