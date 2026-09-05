@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { items } = parsed.data;
+    const { items, paymentMethod } = parsed.data;
     const productIds = items.map((i) => i.productId);
     const products = await db.product.findMany({
       where: { id: { in: productIds }, isActive: true },
@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
             userId: user.id,
             status: "PENDING_PAYMENT",
             totalAmount,
+            paymentMethod,
             // One OrderItem row per unit (quantity always 1 here), not
             // one row per cart line — StockItem<->OrderItem is a strict
             // 1:1 relation, so a "buy 3" line needs 3 rows to eventually

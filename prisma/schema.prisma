@@ -142,6 +142,10 @@ model Order {
   // never trusted from the client.
   totalAmount Int
   currency    String   @default("THB")
+  /// truemoney | promptpay | card — the method the customer picked at
+  /// checkout (analytics only; the Payment row records what actually
+  /// settled it).
+  paymentMethod String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

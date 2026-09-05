@@ -7,12 +7,14 @@ export function StatCard({
   label,
   value,
   trend,
+  trendTone = "neutral",
   tone = "neutral",
 }: {
   icon: LucideIcon;
   label: string;
   value: string;
   trend?: string;
+  trendTone?: "up" | "down" | "neutral";
   tone?: "neutral" | "success" | "warning" | "danger";
 }) {
   const toneClass = {
@@ -21,6 +23,7 @@ export function StatCard({
     warning: "text-warning bg-[var(--warning-soft)]",
     danger: "text-danger bg-[var(--danger-soft)]",
   }[tone];
+  const trendClass = { up: "text-success", down: "text-danger", neutral: "text-muted" }[trendTone];
 
   return (
     <Card className="p-5">
@@ -28,7 +31,7 @@ export function StatCard({
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-2">{label}</p>
           <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
-          {trend && <p className="mt-1 text-xs text-muted">{trend}</p>}
+          {trend && <p className={cn("mt-1 text-xs", trendClass)}>{trend}</p>}
         </div>
         <div className={cn("clip-x-sm flex h-10 w-10 shrink-0 items-center justify-center", toneClass)}>
           <Icon className="h-4.5 w-4.5" />

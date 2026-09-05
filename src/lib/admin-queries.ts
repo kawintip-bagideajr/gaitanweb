@@ -217,6 +217,149 @@ export async function getAdminUsers({ q, page }: ListParams = {}): Promise<
   };
 }
 
+// ---------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------
+
+const PAID_STATUSES: OrderStatus[] = ["PAID", "PROCESSING", "DELIVERED"];
+const BANGKOK = "Asia/Bangkok";
+const DAY_MS = 86_400_000;
+
+/** YYYY-MM-DD for the given instant, in store-local (Bangkok) time. */
+function dayKey(d: Date) {
+  return d.toLocaleDateString("en-CA", { timeZone: BANGKOK });
+}
+
+function bangkokMidnight(d: Date) {
+  return new Date(`${dayKey(d)}T00:00:00+07:00`);
+}
+
+function dayLabel(key: string) {
+  return new Date(`${key}T00:00:00+07:00`).toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    timeZone: BANGKOK,
+  });
+}
+
+export interface DailyPoint {
+  date: string;
+  label: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface AnalyticsData {
+  days: number;
+  summary: {
+    revenue: number;
+    orders: number;
+    avgOrder: number;
+    newCustomers: number;
+    failedOrders: number;
+    prevRevenue: number;
+    prevOrders: number;
+  };
+  daily: DailyPoint[];
+  topProducts: { title: string; gameName: string; units: number; revenue: number }[];
+  byGame: { name: string; units: number; revenue: number }[];
+  paymentMethods: { method: string; count: number }[];
+  orderStatus: { status: OrderStatus; count: number }[];
+}
+
+/**
+ * Everything the analytics page shows, computed from real orders in the
+ * last `days` days (Bangkok-local day buckets). Revenue only counts
+ * orders that actually got paid; the previous equal-length window is
+ * included so the page can show a trend.
+ */
+export async function getAnalytics(days: number): Promise<AnalyticsData> {
+  const start = new Date(bangkokMidnight(new Date()).getTime() - (days - 1) * DAY_MS);
+  const prevStart = new Date(start.getTime() - days * DAY_MS);
+
+  const [orders, prevPaid, newCustomers, paidItems] = await Promise.all([
+    db.order.findMany({
+      where: { createdAt: { gte: start } },
+      select: { status: true, totalAmount: true, createdAt: true, paymentMethod: true },
+    }),
+    db.order.findMany({
+      where: { createdAt: { gte: prevStart, lt: start }, status: { in: PAID_STATUSES } },
+      select: { totalAmount: true },
+    }),
+    db.user.count({ where: { createdAt: { gte: start }, role: "CUSTOMER" } }),
+    db.orderItem.findMany({
+      where: { order: { createdAt: { gte: start }, status: { in: PAID_STATUSES } } },
+      select: {
+        unitPrice: true,
+        product: { select: { title: true, subtitle: true, game: { select: { name: true } } } },
+      },
+    }),
+  ]);
+
+  const paid = orders.filter((o) => PAID_STATUSES.includes(o.status as OrderStatus));
+  const revenue = paid.reduce((s, o) => s + o.totalAmount, 0);
+  const prevRevenue = prevPaid.reduce((s, o) => s + o.totalAmount, 0);
+
+  const daily = new Map<string, DailyPoint>();
+  for (let i = 0; i < days; i++) {
+    const key = dayKey(new Date(start.getTime() + i * DAY_MS));
+    daily.set(key, { date: key, label: dayLabel(key), revenue: 0, orders: 0 });
+  }
+  for (const o of paid) {
+    const point = daily.get(dayKey(o.createdAt));
+    if (!point) continue;
+    point.revenue += o.totalAmount;
+    point.orders += 1;
+  }
+
+  const productAgg = new Map<string, { title: string; gameName: string; units: number; revenue: number }>();
+  const gameAgg = new Map<string, { name: string; units: number; revenue: number }>();
+  for (const item of paidItems) {
+    const title = `${item.product.title}${item.product.subtitle ? ` ${item.product.subtitle}` : ""}`;
+    const gameName = item.product.game.name;
+    const p = productAgg.get(title) ?? { title, gameName, units: 0, revenue: 0 };
+    p.units += 1;
+    p.revenue += item.unitPrice;
+    productAgg.set(title, p);
+    const g = gameAgg.get(gameName) ?? { name: gameName, units: 0, revenue: 0 };
+    g.units += 1;
+    g.revenue += item.unitPrice;
+    gameAgg.set(gameName, g);
+  }
+
+  const methodAgg = new Map<string, number>();
+  for (const o of orders) {
+    const m = o.paymentMethod ?? "unknown";
+    methodAgg.set(m, (methodAgg.get(m) ?? 0) + 1);
+  }
+
+  const statusAgg = new Map<OrderStatus, number>();
+  for (const o of orders) {
+    const s = o.status as OrderStatus;
+    statusAgg.set(s, (statusAgg.get(s) ?? 0) + 1);
+  }
+
+  return {
+    days,
+    summary: {
+      revenue,
+      orders: paid.length,
+      avgOrder: paid.length ? Math.round(revenue / paid.length) : 0,
+      newCustomers,
+      failedOrders: orders.filter((o) => o.status === "FAILED" || o.status === "CANCELLED").length,
+      prevRevenue,
+      prevOrders: prevPaid.length,
+    },
+    daily: Array.from(daily.values()),
+    topProducts: Array.from(productAgg.values())
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 8),
+    byGame: Array.from(gameAgg.values()).sort((a, b) => b.revenue - a.revenue),
+    paymentMethods: Array.from(methodAgg, ([method, count]) => ({ method, count })).sort((a, b) => b.count - a.count),
+    orderStatus: Array.from(statusAgg, ([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count),
+  };
+}
+
 export async function getAdminAuditLogs() {
   const logs = await db.auditLog.findMany({
     orderBy: { createdAt: "desc" },
