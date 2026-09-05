@@ -31,13 +31,13 @@ export function Hero() {
           </span>
 
           <h1 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            อัพเลเวลบัญชีเกม
+            เติมเกม รับไอเทมจริง
             <br />
             <span className="text-gradient">ไวในไม่กี่วินาที</span>
           </h1>
 
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
-            {SITE_CONFIG.description}
+            ร้านเติมเกม & บัตรของขวัญออนไลน์ ครบทุกค่ายเกมดัง — {SITE_CONFIG.description}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
