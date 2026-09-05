@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { AuthCard } from "@/components/marketplace/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useSession } from "@/lib/use-session";
 
 export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const { refresh } = useSession();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,8 +47,8 @@ export default function RegisterPage() {
       return;
     }
 
+    await refresh();
     router.push("/");
-    router.refresh();
   }
 
   return (

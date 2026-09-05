@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/marketplace/AuthCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useSession } from "@/lib/use-session";
 
 export default function LoginPage() {
   return (
@@ -21,6 +22,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
+  const { refresh } = useSession();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,8 +58,11 @@ function LoginForm() {
     // panel instead of the storefront home page.
     const destination = next === "/" && user?.role === "ADMIN" ? "/admin" : next;
 
+    // Update the shared session state before navigating so the navbar
+    // shows "logged in" immediately — it doesn't remount on route change,
+    // so router.refresh() alone (server components only) never reached it.
+    await refresh();
     router.push(destination);
-    router.refresh();
   }
 
   return (
