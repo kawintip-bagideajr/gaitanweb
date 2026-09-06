@@ -25,40 +25,47 @@ export function Hero() {
       />
 
       <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-28">
-        <div className="animate-fade-up text-center lg:text-left">
-          {/* Phones/tablets don't get the side visual, so the logo sits
-              above the headline instead — still floating, still glowing. */}
-          <div className="relative mx-auto mb-6 flex h-40 w-40 items-center justify-center sm:h-52 sm:w-52 lg:hidden">
-            <div className="absolute h-40 w-40 rounded-full bg-primary/30 blur-3xl sm:h-52 sm:w-52" />
-            <div className="absolute h-24 w-24 -translate-x-12 translate-y-10 rounded-full bg-accent-cyan/20 blur-2xl" />
-            <div className="absolute h-24 w-24 translate-x-14 -translate-y-10 rounded-full bg-accent-pink/20 blur-2xl" />
-            <div className="animate-float relative h-full w-full">
-              <Image
-                src="/logo-xelvex.png"
-                alt="Xelvex — Level Up Your Game"
-                width={260}
-                height={260}
-                priority
-                className="animate-drop-glow-pulse h-full w-full object-contain"
-              />
+        <div className="animate-fade-up">
+          {/* Below lg the big side visual is hidden, so the logo sits to
+              the right of the headline instead — same floating glow, just
+              scaled for a phone. Copy and buttons run full width below. */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="min-w-0 flex-1">
+              <span className="clip-x-sm inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-primary-soft">
+                {SITE_CONFIG.tagline}
+              </span>
+
+              <h1 className="mt-4 text-[2rem] font-extrabold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-6xl lg:text-7xl">
+                <span className="whitespace-nowrap">เติมเกม</span>{" "}
+                <br className="sm:hidden" />
+                <span className="whitespace-nowrap">รับไอเทมจริง</span>
+                <br />
+                <span className="text-gradient whitespace-nowrap">ไวในไม่กี่วินาที</span>
+              </h1>
+            </div>
+
+            <div className="relative flex h-32 w-32 shrink-0 items-center justify-center sm:h-52 sm:w-52 lg:hidden">
+              <div className="absolute h-32 w-32 rounded-full bg-primary/30 blur-3xl sm:h-52 sm:w-52" />
+              <div className="absolute h-20 w-20 -translate-x-8 translate-y-8 rounded-full bg-accent-cyan/20 blur-2xl" />
+              <div className="absolute h-20 w-20 translate-x-10 -translate-y-8 rounded-full bg-accent-pink/20 blur-2xl" />
+              <div className="animate-float relative h-full w-full">
+                <Image
+                  src="/logo-xelvex.png"
+                  alt="Xelvex — Level Up Your Game"
+                  width={260}
+                  height={260}
+                  priority
+                  className="animate-drop-glow-pulse h-full w-full object-contain"
+                />
+              </div>
             </div>
           </div>
 
-          <span className="clip-x-sm inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-primary-soft">
-            {SITE_CONFIG.tagline}
-          </span>
-
-          <h1 className="mt-5 text-4xl font-extrabold leading-[0.98] tracking-tight text-foreground sm:mt-6 sm:text-6xl lg:text-7xl">
-            เติมเกม รับไอเทมจริง
-            <br />
-            <span className="text-gradient">ไวในไม่กี่วินาที</span>
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-muted lg:mx-0">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-muted">
             ร้านเติมเกม & บัตรของขวัญออนไลน์ ครบทุกค่ายเกมดัง — {SITE_CONFIG.description}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/products">
               <Button size="lg">เลือกซื้อสินค้า</Button>
             </Link>
@@ -71,7 +78,7 @@ export function Hero() {
 
           <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-4">
             {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
-              <div key={label} className="flex items-center justify-center gap-2 text-sm text-muted lg:justify-start">
+              <div key={label} className="flex items-center gap-2 text-sm text-muted">
                 <Icon className={`h-4 w-4 ${color}`} />
                 <span>{label}</span>
               </div>
