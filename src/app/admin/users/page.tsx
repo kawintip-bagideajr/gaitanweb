@@ -60,22 +60,22 @@ export default async function AdminUsersPage({
                 const isMe = u.id === me?.id;
                 return (
                   <Tr key={u.id}>
-                    <Td>
+                    <Td primary>
                       <Link href={`/admin/users/${u.id}`} className="font-medium text-primary-soft hover:underline">
                         {u.displayName}
                       </Link>
                       {isMe && <span className="ml-1.5 text-[10px] text-muted-2">(คุณ)</span>}
                     </Td>
-                    <Td className="text-muted">{u.email}</Td>
-                    <Td>
+                    <Td label="อีเมล" className="text-muted">{u.email}</Td>
+                    <Td label="สิทธิ์">
                       <Badge tone={u.role === "ADMIN" ? "primary" : "neutral"}>{u.role === "ADMIN" ? "แอดมิน" : "ลูกค้า"}</Badge>
                     </Td>
-                    <Td className="text-muted">{u.orderCount}</Td>
-                    <Td>
+                    <Td label="ออเดอร์" className="text-muted">{u.orderCount}</Td>
+                    <Td label="สถานะ">
                       <Badge tone={u.isActive ? "success" : "danger"}>{u.isActive ? "ใช้งานอยู่" : "ระงับ"}</Badge>
                     </Td>
-                    <Td className="text-muted">{u.createdAt}</Td>
-                    <Td className="text-right">
+                    <Td label="สมัครเมื่อ" className="whitespace-nowrap text-muted">{u.createdAt}</Td>
+                    <Td actions className="text-right">
                       {!isMe && (
                         <div className="flex items-center justify-end gap-3">
                           <AdminActionButton

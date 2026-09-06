@@ -5,6 +5,7 @@ import { ColumnChart } from "@/components/admin/charts";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 import { formatDateTH, formatTHB } from "@/lib/utils";
 import { getAnalytics, getDashboardStats, getLowStockProducts, getRecentOrders } from "@/lib/admin-queries";
 
@@ -65,37 +66,33 @@ export default async function AdminDashboardPage() {
           {recentOrders.length === 0 ? (
             <p className="px-5 pb-5 text-sm text-muted-2">ยังไม่มีออเดอร์</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-sm">
-                <thead className="border-y border-border bg-surface-2/60 text-left text-xs uppercase tracking-wide text-muted-2">
-                  <tr>
-                    <th className="px-5 py-2.5 font-semibold">ออเดอร์</th>
-                    <th className="px-5 py-2.5 font-semibold">ลูกค้า</th>
-                    <th className="px-5 py-2.5 font-semibold">ยอด</th>
-                    <th className="px-5 py-2.5 font-semibold">สถานะ</th>
-                    <th className="px-5 py-2.5 font-semibold">เวลา</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {recentOrders.map((o) => (
-                    <tr key={o.orderNumber} className="transition-colors hover:bg-surface-2/50">
-                      <td className="px-5 py-3">
-                        <Link href={`/admin/orders/${o.orderNumber}`} className="font-medium text-primary-soft hover:underline">
-                          {o.orderNumber}
-                        </Link>
-                        <p className="text-xs text-muted-2">{o.productTitle}</p>
-                      </td>
-                      <td className="px-5 py-3 text-muted">{o.customerEmail}</td>
-                      <td className="px-5 py-3 font-semibold text-foreground">{formatTHB(o.price)}</td>
-                      <td className="px-5 py-3">
-                        <StatusBadge status={o.status} />
-                      </td>
-                      <td className="px-5 py-3 text-muted">{formatDateTH(o.createdAt)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table className="border-0 border-t">
+              <THead>
+                <Th>ออเดอร์</Th>
+                <Th>ลูกค้า</Th>
+                <Th>ยอด</Th>
+                <Th>สถานะ</Th>
+                <Th>เวลา</Th>
+              </THead>
+              <TBody>
+                {recentOrders.map((o) => (
+                  <Tr key={o.orderNumber}>
+                    <Td primary>
+                      <Link href={`/admin/orders/${o.orderNumber}`} className="font-medium text-primary-soft hover:underline">
+                        {o.orderNumber}
+                      </Link>
+                      <p className="text-xs text-muted-2">{o.productTitle}</p>
+                    </Td>
+                    <Td label="ลูกค้า" className="text-muted">{o.customerEmail}</Td>
+                    <Td label="ยอด" className="font-semibold">{formatTHB(o.price)}</Td>
+                    <Td label="สถานะ">
+                      <StatusBadge status={o.status} />
+                    </Td>
+                    <Td label="เวลา" className="whitespace-nowrap text-muted">{formatDateTH(o.createdAt)}</Td>
+                  </Tr>
+                ))}
+              </TBody>
+            </Table>
           )}
         </Card>
 

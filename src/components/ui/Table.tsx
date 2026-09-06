@@ -1,9 +1,15 @@
 import { cn } from "@/lib/utils";
 
-export function Table({ children }: { children: React.ReactNode }) {
+/**
+ * Data table that collapses into stacked cards below the `md` breakpoint
+ * (see `.data-table` in globals.css). Give each <Td> a `label` so the
+ * card shows what the value means; mark the identifying cell `primary`,
+ * the row's buttons `actions`, and a bulk-select checkbox `check`.
+ */
+export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="clip-x-md overflow-x-auto border border-border bg-surface">
-      <table className="w-full min-w-[640px] border-collapse text-sm">{children}</table>
+    <div className={cn("data-table clip-x-md overflow-x-auto border border-border bg-surface", className)}>
+      <table className="w-full border-collapse text-sm md:min-w-[640px]">{children}</table>
     </div>
   );
 }
@@ -28,6 +34,29 @@ export function Tr({ children, className }: { children: React.ReactNode; classNa
   return <tr className={cn("transition-colors hover:bg-surface-2/50", className)}>{children}</tr>;
 }
 
-export function Td({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <td className={cn("px-4 py-3 text-foreground", className)}>{children}</td>;
+interface TdProps {
+  children?: React.ReactNode;
+  className?: string;
+  /** Shown as the field name in card mode. */
+  label?: string;
+  /** The row's title cell — full width, no label, in card mode. */
+  primary?: boolean;
+  /** Row action buttons — pinned to the card's bottom edge. */
+  actions?: boolean;
+  /** Bulk-select checkbox — pinned to the card's top-right corner. */
+  check?: boolean;
+}
+
+export function Td({ children, className, label, primary, actions, check }: TdProps) {
+  return (
+    <td
+      className={cn("px-4 py-3 text-foreground", className)}
+      data-label={label}
+      data-primary={primary ? "" : undefined}
+      data-actions={actions ? "" : undefined}
+      data-check={check ? "" : undefined}
+    >
+      {children}
+    </td>
+  );
 }

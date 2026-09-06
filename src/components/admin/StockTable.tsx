@@ -162,23 +162,23 @@ export function StockTable({ rows }: { rows: StockRow[] }) {
             const toggleable = item.status === "AVAILABLE" || item.status === "DISABLED";
             return (
               <Tr key={item.id} className={selected.has(item.id) ? "bg-primary/5" : undefined}>
-                <Td>
+                <Td check>
                   {toggleable && (
                     <input type="checkbox" aria-label="เลือก" checked={selected.has(item.id)} onChange={() => toggleOne(item.id)} className="h-4 w-4 accent-primary" />
                   )}
                 </Td>
-                <Td>{item.productTitle}</Td>
-                <Td>
+                <Td primary>{item.productTitle}</Td>
+                <Td label="โค้ด">
                   <div className="flex items-center gap-3">
                     <code className="text-xs text-muted">{item.maskedSecret}</code>
                     <RevealCode id={item.id} />
                   </div>
                 </Td>
-                <Td>
+                <Td label="สถานะ">
                   <Badge tone={TONE[item.status]}>{LABEL[item.status]}</Badge>
                 </Td>
-                <Td className="text-muted">{item.addedAt}</Td>
-                <Td className="text-right">
+                <Td label="เพิ่มเมื่อ" className="whitespace-nowrap text-muted">{item.addedAt}</Td>
+                <Td actions className="text-right">
                   {toggleable && (
                     <AdminActionButton
                       label={item.status === "AVAILABLE" ? "ปิดใช้งาน" : "เปิดใช้งาน"}

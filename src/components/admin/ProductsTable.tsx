@@ -96,10 +96,10 @@ export function ProductsTable({ rows }: { rows: ProductRow[] }) {
         <TBody>
           {rows.map((p) => (
             <Tr key={p.id} className={selected.has(p.id) ? "bg-primary/5" : undefined}>
-              <Td>
+              <Td check>
                 <input type="checkbox" aria-label={`เลือก ${p.title}`} checked={selected.has(p.id)} onChange={() => toggleOne(p.id)} className="h-4 w-4 accent-primary" />
               </Td>
-              <Td>
+              <Td primary>
                 <div className="flex items-center gap-3">
                   <div className="clip-x-sm relative h-11 w-11 shrink-0 overflow-hidden bg-surface-2">
                     {p.image ? (
@@ -119,15 +119,15 @@ export function ProductsTable({ rows }: { rows: ProductRow[] }) {
                   </div>
                 </div>
               </Td>
-              <Td className="text-muted">{p.gameName}</Td>
-              <Td className="font-semibold">{formatTHB(p.price)}</Td>
-              <Td>
+              <Td label="เกม" className="text-muted">{p.gameName}</Td>
+              <Td label="ราคา" className="font-semibold">{formatTHB(p.price)}</Td>
+              <Td label="สต๊อก">
                 <Badge tone={p.stockCount === 0 ? "danger" : p.stockCount <= 10 ? "warning" : "neutral"}>{p.stockCount}</Badge>
               </Td>
-              <Td>
+              <Td label="สถานะ">
                 <Badge tone={p.isActive ? "success" : "neutral"}>{p.isActive ? "เปิดขาย" : "ปิดขาย"}</Badge>
               </Td>
-              <Td className="text-right">
+              <Td actions className="text-right">
                 <div className="flex items-center justify-end gap-3">
                   <Link href={`/admin/products/${p.id}/edit`} className="text-xs font-medium text-primary-soft hover:underline">
                     แก้ไข

@@ -60,22 +60,22 @@ export default async function AdminOrdersPage({
             <TBody>
               {orders.map((order) => (
                 <Tr key={order.orderNumber}>
-                  <Td>
+                  <Td primary>
                     <Link href={`/admin/orders/${order.orderNumber}`} className="font-medium text-primary-soft hover:underline">
                       {order.orderNumber}
                     </Link>
                   </Td>
-                  <Td className="text-muted">{order.customerEmail}</Td>
-                  <Td className="text-muted">
+                  <Td label="ลูกค้า" className="text-muted">{order.customerEmail}</Td>
+                  <Td label="สินค้า" className="text-muted">
                     {order.productTitle}
                     {order.itemCount > 1 && <span className="text-muted-2"> ({order.itemCount} ชิ้น)</span>}
                   </Td>
-                  <Td className="font-semibold">{formatTHB(order.price)}</Td>
-                  <Td>
+                  <Td label="ยอดชำระ" className="font-semibold">{formatTHB(order.price)}</Td>
+                  <Td label="สถานะ">
                     <StatusBadge status={order.status} />
                   </Td>
-                  <Td className="text-muted">{formatDateTH(order.createdAt)}</Td>
-                  <Td className="text-right">
+                  <Td label="วันที่" className="whitespace-nowrap text-muted">{formatDateTH(order.createdAt)}</Td>
+                  <Td actions className="text-right">
                     <Link href={`/admin/orders/${order.orderNumber}`} className="text-xs font-medium text-primary-soft hover:underline">
                       จัดการ
                     </Link>

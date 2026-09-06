@@ -63,19 +63,19 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               <TBody>
                 {order.items.map((item) => (
                   <Tr key={item.id}>
-                    <Td>
+                    <Td primary>
                       <p className="font-medium">{item.title}</p>
                       <p className="text-xs text-muted-2">{item.gameName}</p>
                     </Td>
-                    <Td>{formatTHB(item.unitPrice)}</Td>
-                    <Td>
+                    <Td label="ราคา">{formatTHB(item.unitPrice)}</Td>
+                    <Td label="โค้ด">
                       {item.maskedCode ? (
                         <code className="text-xs text-muted">{item.maskedCode}</code>
                       ) : (
                         <span className="text-xs text-warning">รอสต๊อก</span>
                       )}
                     </Td>
-                    <Td>
+                    <Td label="การจัดส่ง">
                       {item.deliveryStatus === "DELIVERED" ? (
                         <span className="text-xs text-success">ส่งแล้ว {item.deliveredAt ? formatDateTH(item.deliveredAt) : ""}</span>
                       ) : (
@@ -104,15 +104,15 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                 <TBody>
                   {order.payments.map((p) => (
                     <Tr key={p.id}>
-                      <Td>
+                      <Td primary>
                         <code className="text-xs">{p.transactionId}</code>
                       </Td>
-                      <Td className="text-muted">{p.provider}</Td>
-                      <Td>{formatTHB(p.amount)}</Td>
-                      <Td>
+                      <Td label="ช่องทาง" className="text-muted">{p.provider}</Td>
+                      <Td label="จำนวน">{formatTHB(p.amount)}</Td>
+                      <Td label="สถานะ">
                         <Badge tone={PAYMENT_TONE[p.status] ?? "neutral"}>{p.status}</Badge>
                       </Td>
-                      <Td className="text-muted">{formatDateTH(p.paidAt ?? p.createdAt)}</Td>
+                      <Td label="เวลา" className="whitespace-nowrap text-muted">{formatDateTH(p.paidAt ?? p.createdAt)}</Td>
                     </Tr>
                   ))}
                 </TBody>

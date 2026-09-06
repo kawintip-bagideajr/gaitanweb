@@ -59,19 +59,19 @@ export default async function AdminAuditLogsPage({
                 const meta = prettyMetadata(log.metadata);
                 return (
                   <Tr key={log.id}>
-                    <Td className="whitespace-nowrap text-muted">{formatDateTH(log.createdAt)}</Td>
-                    <Td>
+                    <Td label="เวลา" className="whitespace-nowrap text-muted">{formatDateTH(log.createdAt)}</Td>
+                    <Td primary>
                       <p className="font-medium">{log.actor}</p>
                       <p className="text-xs text-muted-2">{log.actorEmail}</p>
                     </Td>
-                    <Td>
+                    <Td label="Action">
                       <code className="text-xs text-primary-soft">{log.action}</code>
                     </Td>
-                    <Td>
+                    <Td label="เป้าหมาย">
                       <p className="text-muted">{log.entity}</p>
                       <code className="text-[10px] text-muted-2">{log.entityId}</code>
                     </Td>
-                    <Td>
+                    <Td label="รายละเอียด">
                       {meta ? (
                         <details className="group">
                           <summary className="cursor-pointer text-xs text-muted hover:text-foreground">ดูข้อมูล</summary>

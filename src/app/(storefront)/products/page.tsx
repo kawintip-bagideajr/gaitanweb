@@ -3,6 +3,7 @@ import { PackageSearch, Search } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductCard } from "@/components/marketplace/ProductCard";
+import { FilterPanel } from "@/components/marketplace/FilterPanel";
 import { cn, TIER_STYLES, type ProductTier } from "@/lib/utils";
 import { getAllProducts, getGames, getProductCategories, type ProductFilters } from "@/lib/queries";
 
@@ -49,8 +50,8 @@ export default async function ProductsPage({
 
       <div className="mt-4 mb-8 flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-2xl font-bold text-foreground">สินค้าทั้งหมด</h1>
-        <div className="flex items-center gap-4">
-          <form method="GET" className="clip-x-sm flex h-10 w-64 items-center gap-2 border border-border bg-surface-2 px-3">
+        <div className="flex w-full items-center gap-4 sm:w-auto">
+          <form method="GET" className="clip-x-sm flex h-10 w-full items-center gap-2 border border-border bg-surface-2 px-3 sm:w-64">
             {gameSlug && <input type="hidden" name="game" value={gameSlug} />}
             {category && <input type="hidden" name="category" value={category} />}
             {tier && <input type="hidden" name="tier" value={tier} />}
@@ -64,12 +65,12 @@ export default async function ProductsPage({
               className="h-full w-full bg-transparent text-sm text-foreground placeholder:text-muted-2 outline-none"
             />
           </form>
-          <span className="text-sm text-muted">{products.length} รายการ</span>
+          <span className="shrink-0 text-sm text-muted">{products.length} รายการ</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]">
-        <aside className="flex flex-col gap-6">
+        <FilterPanel activeCount={[gameSlug, category, tier, sort].filter(Boolean).length}>
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-2">
               เกม
@@ -185,7 +186,7 @@ export default async function ProductsPage({
               ))}
             </div>
           </div>
-        </aside>
+        </FilterPanel>
 
         <div>
           {products.length === 0 ? (

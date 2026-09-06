@@ -330,3 +330,66 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-strong);
 }
+
+/* ---------- Responsive data tables: rows become cards below md ---------- */
+@media (max-width: 767px) {
+  .data-table {
+    overflow-x: visible;
+  }
+  .data-table table,
+  .data-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .data-table thead {
+    display: none;
+  }
+  .data-table tr {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.9rem 1rem;
+  }
+  .data-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0;
+    text-align: right;
+  }
+  .data-table td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    text-align: left;
+  }
+  .data-table td[data-primary] {
+    display: block;
+    text-align: left;
+    margin-bottom: 0.2rem;
+  }
+  .data-table td[data-actions] {
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+  }
+  .data-table td[data-check] {
+    position: absolute;
+    top: 0.95rem;
+    right: 1rem;
+    padding: 0;
+  }
+  .data-table tr:has(td[data-check]) td[data-primary] {
+    padding-right: 2.25rem;
+  }
+  .data-table td:empty {
+    display: none;
+  }
+}

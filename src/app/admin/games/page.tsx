@@ -40,7 +40,7 @@ export default async function AdminGamesPage() {
           <TBody>
             {games.map((g) => (
               <Tr key={g.id}>
-                <Td>
+                <Td primary>
                   <div className="flex items-center gap-3">
                     <div className="clip-x-sm relative h-11 w-11 shrink-0 overflow-hidden bg-surface-2">
                       {g.coverImage ? (
@@ -54,16 +54,16 @@ export default async function AdminGamesPage() {
                     <span className="font-medium">{g.name}</span>
                   </div>
                 </Td>
-                <Td className="text-muted">{g.slug}</Td>
-                <Td>
+                <Td label="Slug" className="text-muted">{g.slug}</Td>
+                <Td label="จำนวนสินค้า">
                   <Link href={`/admin/products?game=${g.id}`} className="text-primary-soft hover:underline">
                     {g.productCount} รายการ
                   </Link>
                 </Td>
-                <Td>
+                <Td label="สถานะ">
                   <Badge tone={g.isActive ? "success" : "neutral"}>{g.isActive ? "เปิดใช้งาน" : "ปิดใช้งาน"}</Badge>
                 </Td>
-                <Td className="text-right">
+                <Td actions className="text-right">
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/games/${g.id}/edit`} className="text-xs font-medium text-primary-soft hover:underline">
                       แก้ไข

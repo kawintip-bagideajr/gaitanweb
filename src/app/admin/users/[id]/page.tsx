@@ -59,17 +59,17 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <TBody>
                 {user.orders.map((o) => (
                   <Tr key={o.orderNumber}>
-                    <Td>
+                    <Td primary>
                       <Link href={`/admin/orders/${o.orderNumber}`} className="font-medium text-primary-soft hover:underline">
                         {o.orderNumber}
                       </Link>
                     </Td>
-                    <Td className="text-muted">{o.productTitle}</Td>
-                    <Td className="font-semibold">{formatTHB(o.price)}</Td>
-                    <Td>
+                    <Td label="สินค้า" className="text-muted">{o.productTitle}</Td>
+                    <Td label="ยอด" className="font-semibold">{formatTHB(o.price)}</Td>
+                    <Td label="สถานะ">
                       <StatusBadge status={o.status} />
                     </Td>
-                    <Td className="text-muted">{formatDateTH(o.createdAt)}</Td>
+                    <Td label="วันที่" className="whitespace-nowrap text-muted">{formatDateTH(o.createdAt)}</Td>
                   </Tr>
                 ))}
               </TBody>

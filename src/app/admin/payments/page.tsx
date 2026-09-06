@@ -58,20 +58,20 @@ export default async function AdminPaymentsPage({
                 const meta = STATUSES.find((s) => s.value === p.status);
                 return (
                   <Tr key={p.id}>
-                    <Td>
+                    <Td primary>
                       <code className="text-xs">{p.transactionId}</code>
                     </Td>
-                    <Td>
+                    <Td label="ออเดอร์">
                       <Link href={`/admin/orders/${p.orderNumber}`} className="text-primary-soft hover:underline">
                         {p.orderNumber}
                       </Link>
                     </Td>
-                    <Td className="text-muted">{p.provider}</Td>
-                    <Td className="font-semibold">{formatTHB(p.amount)}</Td>
-                    <Td>
+                    <Td label="ช่องทาง" className="text-muted">{p.provider}</Td>
+                    <Td label="จำนวน" className="font-semibold">{formatTHB(p.amount)}</Td>
+                    <Td label="สถานะ">
                       <Badge tone={meta?.tone ?? "neutral"}>{meta?.label ?? p.status}</Badge>
                     </Td>
-                    <Td className="text-muted">{p.paidAt ? formatDateTH(p.paidAt) : "—"}</Td>
+                    <Td label="ชำระเมื่อ" className="whitespace-nowrap text-muted">{p.paidAt ? formatDateTH(p.paidAt) : "—"}</Td>
                   </Tr>
                 );
               })}
