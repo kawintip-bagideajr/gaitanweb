@@ -55,7 +55,7 @@ export default async function AdminAnalyticsPage({
   return (
     <div>
       <AdminPageHeader
-        title="Analytics"
+        title="สถิติร้าน"
         description={`ยอดขายและพฤติกรรมลูกค้าจากข้อมูลจริง ${days} วันล่าสุด`}
         action={
           <div className="flex items-center gap-2">
