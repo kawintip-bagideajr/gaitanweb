@@ -17,10 +17,10 @@ export function FeaturedProducts({ products }: { products: Product[] }) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-5">
         {products.map((product, i) => (
-          // Phones show an even 2×2; a fifth card would sit alone on its own row.
-          <div key={product.id} className={i >= 4 ? "hidden sm:block" : undefined}>
+          // Below lg the grid is 2×2 or 4-up; a fifth card would sit alone on its own row.
+          <div key={product.id} className={i >= 4 ? "hidden lg:block" : undefined}>
             <ProductCard product={product} />
           </div>
         ))}
