@@ -1,5 +1,11 @@
 import "server-only";
+import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+
+// Neon round-trips are slow enough (hundreds of ms each) that Prisma's
+// default 5s interactive-transaction timeout gets hit on multi-item
+// orders. Give fulfilment room to finish instead of aborting mid-way.
+const TX_OPTIONS = { maxWait: 10_000, timeout: 30_000 } as const;
 
 export interface PaymentEvent {
   orderNumber: string;
@@ -17,11 +23,71 @@ export interface PaymentEventResult {
 }
 
 /**
+ * Claims one AVAILABLE StockItem for every OrderItem that doesn't have
+ * one yet, records the delivery, and settles the order to DELIVERED (all
+ * items fulfilled) or PROCESSING (some still waiting on stock). Safe to
+ * re-run — already-fulfilled items are skipped — which is what lets an
+ * admin retry delivery after restocking.
+ */
+export async function assignStockForOrder(tx: Prisma.TransactionClient, orderId: string) {
+  const orderItems = await tx.orderItem.findMany({
+    where: { orderId },
+    include: { stockItem: { select: { id: true } }, delivery: { select: { status: true } } },
+  });
+
+  let allDelivered = true;
+  for (const orderItem of orderItems) {
+    if (orderItem.stockItem) {
+      if (orderItem.delivery?.status !== "DELIVERED") allDelivered = false;
+      continue;
+    }
+    let claimed = false;
+
+    // Optimistic compare-and-swap: re-assert status: "AVAILABLE" in
+    // the WHERE clause of the write itself. If two requests race for
+    // the same row, only the first UPDATE's WHERE still matches —
+    // the second gets count 0 and retries against a different row.
+    for (let attempt = 0; attempt < 5 && !claimed; attempt++) {
+      const candidate = await tx.stockItem.findFirst({
+        where: { productId: orderItem.productId, status: "AVAILABLE", orderItemId: null },
+        select: { id: true },
+      });
+      if (!candidate) break; // out of stock — leave unfulfilled for admin follow-up
+
+      const result = await tx.stockItem.updateMany({
+        where: { id: candidate.id, status: "AVAILABLE", orderItemId: null },
+        data: { status: "SOLD", orderItemId: orderItem.id },
+      });
+      claimed = result.count === 1;
+    }
+
+    if (claimed) {
+      await tx.delivery.upsert({
+        where: { orderItemId: orderItem.id },
+        create: { orderItemId: orderItem.id, status: "DELIVERED", deliveredAt: new Date() },
+        update: { status: "DELIVERED", deliveredAt: new Date() },
+      });
+    } else {
+      allDelivered = false;
+    }
+  }
+
+  const finalStatus = allDelivered ? "DELIVERED" : "PROCESSING";
+  await tx.order.update({ where: { id: orderId }, data: { status: finalStatus } });
+  return finalStatus;
+}
+
+/** Admin "retry delivery" for a PROCESSING order after restocking. */
+export function fulfillOrder(orderId: string) {
+  return db.$transaction((tx) => assignStockForOrder(tx, orderId), TX_OPTIONS);
+}
+
+/**
  * Single entry point for turning a payment confirmation into order
- * state changes. Called by the real gateway webhook and by the dev
- * payment simulator — both must go through the exact same
- * idempotency / stock-assignment guarantees, so the logic lives here
- * once instead of being duplicated per caller.
+ * state changes. Called by the real gateway webhook, the dev payment
+ * simulator, and the admin "mark as paid" action — all must go through
+ * the exact same idempotency / stock-assignment guarantees, so the
+ * logic lives here once instead of being duplicated per caller.
  */
 export async function processPaymentEvent(event: PaymentEvent): Promise<PaymentEventResult> {
   const { orderNumber, transactionId, provider, amount, status } = event;
@@ -35,10 +101,7 @@ export async function processPaymentEvent(event: PaymentEvent): Promise<PaymentE
     return { ok: true, orderStatus: order?.status, idempotent: true };
   }
 
-  const order = await db.order.findUnique({
-    where: { orderNumber },
-    include: { orderItems: true },
-  });
+  const order = await db.order.findUnique({ where: { orderNumber } });
   if (!order) return { ok: false, error: "order not found" };
 
   if (status === "FAILED") {
@@ -49,7 +112,7 @@ export async function processPaymentEvent(event: PaymentEvent): Promise<PaymentE
       if (order.status === "PENDING_PAYMENT") {
         await tx.order.update({ where: { id: order.id }, data: { status: "FAILED" } });
       }
-    });
+    }, TX_OPTIONS);
     return { ok: true, orderStatus: "FAILED" };
   }
 
@@ -71,53 +134,13 @@ export async function processPaymentEvent(event: PaymentEvent): Promise<PaymentE
     return { ok: false, error: "amount mismatch" };
   }
 
-  await db.$transaction(async (tx) => {
+  const finalStatus = await db.$transaction(async (tx) => {
     await tx.payment.create({
       data: { orderId: order.id, provider, transactionId, amount, status: "SUCCESS", paidAt: new Date() },
     });
     await tx.order.update({ where: { id: order.id }, data: { status: "PAID" } });
+    return assignStockForOrder(tx, order.id);
+  }, TX_OPTIONS);
 
-    for (const orderItem of order.orderItems) {
-      let claimed = false;
-
-      // Optimistic compare-and-swap: re-assert status: "AVAILABLE" in
-      // the WHERE clause of the write itself. If two requests race for
-      // the same row, only the first UPDATE's WHERE still matches —
-      // the second gets count 0 and retries against a different row.
-      // This is safe under any isolation level, not just SQLite's
-      // single-writer lock.
-      for (let attempt = 0; attempt < 5 && !claimed; attempt++) {
-        const candidate = await tx.stockItem.findFirst({
-          where: { productId: orderItem.productId, status: "AVAILABLE", orderItemId: null },
-        });
-        if (!candidate) break; // out of stock — leave unfulfilled for admin follow-up
-
-        const result = await tx.stockItem.updateMany({
-          where: { id: candidate.id, status: "AVAILABLE", orderItemId: null },
-          data: { status: "SOLD", orderItemId: orderItem.id },
-        });
-        claimed = result.count === 1;
-      }
-
-      if (claimed) {
-        await tx.delivery.create({
-          data: { orderItemId: orderItem.id, status: "DELIVERED", deliveredAt: new Date() },
-        });
-      }
-    }
-
-    const items = await tx.orderItem.findMany({
-      where: { orderId: order.id },
-      include: { delivery: true },
-    });
-    const allDelivered = items.every((i) => i.delivery?.status === "DELIVERED");
-
-    await tx.order.update({
-      where: { id: order.id },
-      data: { status: allDelivered ? "DELIVERED" : "PROCESSING" },
-    });
-  });
-
-  const finalOrder = await db.order.findUnique({ where: { id: order.id } });
-  return { ok: true, orderStatus: finalOrder?.status };
+  return { ok: true, orderStatus: finalStatus };
 }
