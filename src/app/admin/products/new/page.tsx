@@ -7,7 +7,7 @@ export default async function NewProductPage() {
 
   return (
     <div>
-      <AdminPageHeader title="Create Product" description="เพิ่มสินค้าใหม่เข้าแคตตาล็อก" />
+      <AdminPageHeader title="เพิ่มสินค้า" description="เพิ่มสินค้าใหม่เข้าแคตตาล็อก" />
       <ProductForm games={games} />
     </div>
   );

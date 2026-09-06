@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AdminActionButton } from "@/components/admin/AdminActionButton";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ export interface GameFormValues {
   id?: string;
   name: string;
   slug: string;
+  coverImage: string;
 }
 
 function slugify(name: string) {
@@ -21,7 +23,7 @@ function slugify(name: string) {
 }
 
 export function GameForm({ initial }: { initial?: GameFormValues }) {
-  const [values, setValues] = useState<GameFormValues>(initial ?? { name: "", slug: "" });
+  const [values, setValues] = useState<GameFormValues>(initial ?? { name: "", slug: "", coverImage: "" });
   const [slugTouched, setSlugTouched] = useState(Boolean(initial));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,11 @@ export function GameForm({ initial }: { initial?: GameFormValues }) {
     const res = await fetch(isEdit ? `/api/admin/games/${initial!.id}` : "/api/admin/games", {
       method: isEdit ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isEdit ? { name: values.name } : { name: values.name, slug: values.slug }),
+      body: JSON.stringify(
+        isEdit
+          ? { name: values.name, coverImage: values.coverImage.trim() }
+          : { name: values.name, slug: values.slug, coverImage: values.coverImage.trim() }
+      ),
     });
 
     setSubmitting(false);
@@ -74,16 +80,37 @@ export function GameForm({ initial }: { initial?: GameFormValues }) {
           disabled={isEdit}
           required
         />
+        <Input
+          label="รูปปกเกม — URL หรือ path ในเว็บ (/games/xxx.svg)"
+          value={values.coverImage}
+          onChange={(e) => setValues((v) => ({ ...v, coverImage: e.target.value }))}
+          placeholder="/games/roblox.svg"
+        />
 
         {error && <p className="text-sm text-danger">{error}</p>}
 
-        <div className="mt-2 flex gap-3">
+        <div className="mt-2 flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={submitting}>
             {submitting ? "กำลังบันทึก..." : isEdit ? "บันทึกการแก้ไข" : "สร้างเกม"}
           </Button>
           <Button type="button" variant="secondary" onClick={() => router.push("/admin/games")}>
             ยกเลิก
           </Button>
+          {isEdit && (
+            <AdminActionButton
+              className="ml-auto"
+              variant="button"
+              tone="danger"
+              label="ลบเกม"
+              request={{ url: `/api/admin/games/${initial!.id}`, method: "DELETE" }}
+              redirectTo="/admin/games"
+              confirm={{
+                title: "ลบเกมนี้ถาวร?",
+                description: "ลบได้เฉพาะเกมที่ไม่มีสินค้าอยู่ ย้อนกลับไม่ได้",
+                confirmLabel: "ลบถาวร",
+              }}
+            />
+          )}
         </div>
       </form>
     </Card>

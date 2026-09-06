@@ -11,7 +11,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   return (
     <div>
-      <AdminPageHeader title="Edit Product" description={product.title} />
+      <AdminPageHeader title="แก้ไขสินค้า" description={`${product.title}${product.subtitle ? ` ${product.subtitle}` : ""}`} />
       <ProductForm
         games={games}
         initial={{
@@ -21,6 +21,8 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           subtitle: product.subtitle ?? "",
           category: product.category ?? "",
           price: product.price,
+          image: product.image ?? "",
+          sortOrder: product.sortOrder,
           autoDelivery: product.autoDelivery,
         }}
       />

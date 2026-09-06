@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
     const existing = await db.game.findUnique({ where: { slug: parsed.data.slug } });
     if (existing) return NextResponse.json({ error: "Slug นี้ถูกใช้แล้ว" }, { status: 409 });
 
-    const game = await db.game.create({ data: parsed.data });
+    const game = await db.game.create({
+      data: { name: parsed.data.name, slug: parsed.data.slug, coverImage: parsed.data.coverImage || null },
+    });
     await writeAuditLog(admin.id, "game.create", "Game", game.id, { name: game.name });
 
     return NextResponse.json(game);

@@ -1,88 +1,62 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
-import { AdminActionButton, patchJson } from "@/components/admin/AdminActionButton";
-import { Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
+import { FilterPills, FilterSelect } from "@/components/admin/FilterControls";
+import { ProductsTable } from "@/components/admin/ProductsTable";
 import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatTHB } from "@/lib/utils";
-import { getAdminProducts } from "@/lib/admin-queries";
+import { getAdminGames, getAdminProducts } from "@/lib/admin-queries";
 
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; game?: string; status?: string }>;
 }) {
-  const { q, page } = await searchParams;
-  const { rows: products, totalPages, page: currentPage, total } = await getAdminProducts({
-    q,
-    page: page ? Number(page) : 1,
-  });
+  const { q, page, game, status: statusParam } = await searchParams;
+  const status = statusParam === "active" || statusParam === "inactive" ? statusParam : undefined;
+  const [games, { rows, totalPages, page: currentPage, total }] = await Promise.all([
+    getAdminGames(),
+    getAdminProducts({ q, page: page ? Number(page) : 1, gameId: game, status }),
+  ]);
+  const query = { q, game, status };
 
   return (
     <div>
       <AdminPageHeader
-        title="Product Management"
-        description={`ทั้งหมด ${total} สินค้า`}
-        searchPlaceholder="ค้นหาสินค้า..."
+        title="สินค้า"
+        description={`ทั้งหมด ${total} รายการ`}
+        searchPlaceholder="ค้นหาชื่อสินค้า / หมวดหมู่..."
         searchDefault={q}
+        hiddenParams={{ game, status }}
+        filters={
+          <>
+            <FilterSelect name="game" value={game} allLabel="ทุกเกม" options={games.map((g) => ({ value: g.id, label: g.name }))} />
+            <FilterPills
+              name="status"
+              value={status}
+              options={[
+                { value: "active", label: "เปิดขาย" },
+                { value: "inactive", label: "ปิดขาย" },
+              ]}
+            />
+          </>
+        }
         action={
           <Link href="/admin/products/new">
             <Button size="sm">
-              <Plus className="h-4 w-4" /> Create Product
+              <Plus className="h-4 w-4" /> เพิ่มสินค้า
             </Button>
           </Link>
         }
       />
 
-      {products.length === 0 ? (
-        <EmptyState title="ไม่พบสินค้า" description={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : "ยังไม่มีสินค้าในระบบ"} />
+      {rows.length === 0 ? (
+        <EmptyState title="ไม่พบสินค้า" description={q || game || status ? "ลองเปลี่ยนคำค้นหาหรือตัวกรอง" : "ยังไม่มีสินค้าในระบบ"} />
       ) : (
         <>
-          <Table>
-            <THead>
-              <Th>สินค้า</Th>
-              <Th>เกม</Th>
-              <Th>ราคา</Th>
-              <Th>สต๊อก</Th>
-              <Th>สถานะ</Th>
-              <Th className="text-right">จัดการ</Th>
-            </THead>
-            <TBody>
-              {products.map((p) => (
-                <Tr key={p.id}>
-                  <Td>
-                    <p className="font-medium">{p.title}</p>
-                    <p className="text-xs text-muted">{p.subtitle}</p>
-                  </Td>
-                  <Td className="text-muted">{p.gameName}</Td>
-                  <Td>{formatTHB(p.price)}</Td>
-                  <Td>
-                    <Badge tone={p.stockCount <= 10 ? "warning" : "neutral"}>{p.stockCount}</Badge>
-                  </Td>
-                  <Td>
-                    <Badge tone={p.isActive ? "success" : "neutral"}>{p.isActive ? "เปิดใช้งาน" : "ปิดใช้งาน"}</Badge>
-                  </Td>
-                  <Td className="text-right">
-                    <div className="flex items-center justify-end gap-3">
-                      <Link href={`/admin/products/${p.id}/edit`} className="text-xs font-medium text-primary-soft hover:underline">
-                        แก้ไข
-                      </Link>
-                      <AdminActionButton
-                        label={p.isActive ? "ปิดใช้งาน" : "เปิดใช้งาน"}
-                        tone={p.isActive ? "danger" : "primary"}
-                        onClick={() => patchJson(`/api/admin/products/${p.id}`, { isActive: !p.isActive })}
-                      />
-                    </div>
-                  </Td>
-                </Tr>
-              ))}
-            </TBody>
-          </Table>
-
-          <Pagination page={currentPage} totalPages={totalPages} basePath="/admin/products" query={{ q }} />
+          <ProductsTable rows={rows} />
+          <Pagination page={currentPage} totalPages={totalPages} basePath="/admin/products" query={query} />
         </>
       )}
     </div>

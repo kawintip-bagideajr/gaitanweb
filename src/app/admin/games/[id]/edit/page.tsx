@@ -10,8 +10,8 @@ export default async function EditGamePage({ params }: { params: Promise<{ id: s
 
   return (
     <div>
-      <AdminPageHeader title="Edit Game" description={game.name} />
-      <GameForm initial={{ id: game.id, name: game.name, slug: game.slug }} />
+      <AdminPageHeader title="แก้ไขเกม" description={game.name} />
+      <GameForm initial={{ id: game.id, name: game.name, slug: game.slug, coverImage: game.coverImage ?? "" }} />
     </div>
   );
 }

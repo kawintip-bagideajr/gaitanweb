@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
         subtitle: parsed.data.subtitle || null,
         category: parsed.data.category || null,
         price: parsed.data.price,
+        image: parsed.data.image || null,
+        sortOrder: parsed.data.sortOrder ?? 0,
         autoDelivery: parsed.data.autoDelivery,
         slug: slugify(parsed.data.title, parsed.data.subtitle),
       },
