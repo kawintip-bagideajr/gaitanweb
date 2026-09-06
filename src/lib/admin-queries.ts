@@ -1,8 +1,22 @@
 import "server-only";
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { OrderStatus, PaymentStatus, StockStatus } from "@/types";
 
 const PAGE_SIZE = 10;
+
+/** Case-insensitive `contains` — Postgres is case-sensitive by default. */
+const ci = (s: string) => ({ contains: s, mode: "insensitive" as const });
+
+/** Never show a raw code in a list view — keep only the last 4 characters. */
+export function maskSecret(secret: string) {
+  return secret.replace(/.(?=.{4})/g, "•");
+}
+
+function itemsSummary(first: string | undefined, count: number) {
+  if (!first) return "-";
+  return count <= 1 ? first : `${first} และอีก ${count - 1} รายการ`;
+}
 
 export interface ListParams {
   q?: string;
@@ -19,6 +33,20 @@ export interface Paginated<T> {
 function pageOf(page?: number) {
   return Math.max(1, page ?? 1);
 }
+
+function paginate<T>(rows: T[], total: number, page?: number): Paginated<T> {
+  return { rows, page: pageOf(page), totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)), total };
+}
+
+function skipTake(page?: number) {
+  return { skip: (pageOf(page) - 1) * PAGE_SIZE, take: PAGE_SIZE };
+}
+
+// ---------------------------------------------------------------
+// Dashboard
+// ---------------------------------------------------------------
+
+export const LOW_STOCK_THRESHOLD = 10;
 
 export async function getDashboardStats() {
   const [
@@ -45,7 +73,7 @@ export async function getDashboardStats() {
   ]);
 
   const totalSales = deliveredOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-  const lowStockCount = lowStockProducts.filter((p) => p._count.stockItems <= 10).length;
+  const lowStockCount = lowStockProducts.filter((p) => p._count.stockItems <= LOW_STOCK_THRESHOLD).length;
 
   return {
     totalSales,
@@ -59,121 +87,287 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getAdminProducts({ q, page }: ListParams = {}): Promise<
-  Paginated<{ id: string; title: string; subtitle: string | null; gameName: string; price: number; stockCount: number; isActive: boolean }>
-> {
-  const where = q ? { title: { contains: q } } : {};
+export async function getRecentOrders(limit = 6) {
+  const orders = await db.order.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    include: {
+      user: { select: { email: true } },
+      orderItems: { include: { product: { select: { title: true } } }, take: 1 },
+      _count: { select: { orderItems: true } },
+    },
+  });
+  return orders.map((o) => ({
+    orderNumber: o.orderNumber,
+    customerEmail: o.user.email,
+    productTitle: itemsSummary(o.orderItems[0]?.product.title, o._count.orderItems),
+    price: o.totalAmount,
+    status: o.status as OrderStatus,
+    createdAt: o.createdAt.toISOString(),
+  }));
+}
+
+export async function getLowStockProducts(limit = 8) {
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    include: { game: { select: { name: true } }, _count: { select: { stockItems: { where: { status: "AVAILABLE" } } } } },
+  });
+  return products
+    .map((p) => ({
+      id: p.id,
+      title: `${p.title}${p.subtitle ? ` ${p.subtitle}` : ""}`,
+      gameName: p.game.name,
+      stockCount: p._count.stockItems,
+    }))
+    .filter((p) => p.stockCount <= LOW_STOCK_THRESHOLD)
+    .sort((a, b) => a.stockCount - b.stockCount)
+    .slice(0, limit);
+}
+
+// ---------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------
+
+export interface ProductListParams extends ListParams {
+  gameId?: string;
+  status?: "active" | "inactive";
+}
+
+export async function getAdminProducts({ q, page, gameId, status }: ProductListParams = {}) {
+  const where: Prisma.ProductWhereInput = {
+    ...(q ? { OR: [{ title: ci(q) }, { subtitle: ci(q) }, { category: ci(q) }] } : {}),
+    ...(gameId ? { gameId } : {}),
+    ...(status ? { isActive: status === "active" } : {}),
+  };
   const [total, products] = await Promise.all([
     db.product.count({ where }),
     db.product.findMany({
       where,
-      orderBy: { sortOrder: "asc" },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       include: {
         game: { select: { name: true } },
         _count: { select: { stockItems: { where: { status: "AVAILABLE" } } } },
       },
-      skip: (pageOf(page) - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      ...skipTake(page),
     }),
   ]);
 
-  return {
-    rows: products.map((p) => ({
+  return paginate(
+    products.map((p) => ({
       id: p.id,
       title: p.title,
       subtitle: p.subtitle,
+      category: p.category,
+      gameId: p.gameId,
       gameName: p.game.name,
       price: p.price,
+      image: p.image,
+      sortOrder: p.sortOrder,
       stockCount: p._count.stockItems,
       isActive: p.isActive,
     })),
-    page: pageOf(page),
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     total,
-  };
+    page
+  );
 }
 
-export async function getAdminStock({ q, page }: ListParams = {}): Promise<
-  Paginated<{ id: string; productTitle: string; maskedSecret: string; status: StockStatus; addedAt: string }>
-> {
-  const where = q ? { product: { title: { contains: q } } } : {};
+export async function getAdminGames() {
+  const games = await db.game.findMany({
+    orderBy: { sortOrder: "asc" },
+    include: { _count: { select: { products: true } } },
+  });
+  return games.map((g) => ({
+    id: g.id,
+    name: g.name,
+    slug: g.slug,
+    coverImage: g.coverImage,
+    isActive: g.isActive,
+    productCount: g._count.products,
+  }));
+}
+
+// ---------------------------------------------------------------
+// Stock
+// ---------------------------------------------------------------
+
+export interface StockListParams extends ListParams {
+  productId?: string;
+  status?: StockStatus;
+}
+
+export async function getAdminStock({ q, page, productId, status }: StockListParams = {}) {
+  const where: Prisma.StockItemWhereInput = {
+    ...(q ? { product: { OR: [{ title: ci(q) }, { subtitle: ci(q) }] } } : {}),
+    ...(productId ? { productId } : {}),
+    ...(status ? { status } : {}),
+  };
   const [total, items] = await Promise.all([
     db.stockItem.count({ where }),
     db.stockItem.findMany({
       where,
       orderBy: { createdAt: "desc" },
       include: { product: { select: { title: true, subtitle: true } } },
-      skip: (pageOf(page) - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      ...skipTake(page),
     }),
   ]);
 
-  return {
-    rows: items.map((s) => ({
+  return paginate(
+    items.map((s) => ({
       id: s.id,
+      productId: s.productId,
       productTitle: `${s.product.title}${s.product.subtitle ? ` ${s.product.subtitle}` : ""}`,
-      // Never send the real secret to an admin list view — mask it the
-      // same way a public API would; full value is only ever read by
-      // the owning customer's delivery page after DELIVERED.
-      maskedSecret: s.secretData.replace(/.(?=.{4})/g, "•"),
+      maskedSecret: maskSecret(s.secretData),
       status: s.status as StockStatus,
       addedAt: s.createdAt.toISOString().slice(0, 10),
     })),
-    page: pageOf(page),
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     total,
-  };
+    page
+  );
 }
 
-export async function getAdminOrders({ q, page }: ListParams = {}): Promise<
-  Paginated<{ orderNumber: string; productTitle: string; price: number; createdAt: string; status: OrderStatus }>
-> {
-  const where = q ? { orderNumber: { contains: q } } : {};
+/** Per-product stock counts — what an admin actually checks every morning. */
+export async function getStockSummary() {
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: { game: { select: { name: true } }, stockItems: { select: { status: true } } },
+  });
+  return products.map((p) => {
+    const count = (status: StockStatus) => p.stockItems.filter((s) => s.status === status).length;
+    return {
+      id: p.id,
+      title: `${p.title}${p.subtitle ? ` ${p.subtitle}` : ""}`,
+      gameName: p.game.name,
+      available: count("AVAILABLE"),
+      sold: count("SOLD"),
+      disabled: count("DISABLED"),
+    };
+  });
+}
+
+export async function getProductOptions() {
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    select: { id: true, title: true, subtitle: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  });
+  return products.map((p) => ({ id: p.id, label: `${p.title}${p.subtitle ? ` ${p.subtitle}` : ""}` }));
+}
+
+// ---------------------------------------------------------------
+// Orders & payments
+// ---------------------------------------------------------------
+
+export interface OrderListParams extends ListParams {
+  status?: OrderStatus;
+}
+
+export async function getAdminOrders({ q, page, status }: OrderListParams = {}) {
+  const where: Prisma.OrderWhereInput = {
+    ...(q ? { OR: [{ orderNumber: ci(q) }, { user: { email: ci(q) } }] } : {}),
+    ...(status ? { status } : {}),
+  };
   const [total, orders] = await Promise.all([
     db.order.count({ where }),
     db.order.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      include: { orderItems: { include: { product: true }, take: 1 }, _count: { select: { orderItems: true } } },
-      skip: (pageOf(page) - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      include: {
+        user: { select: { email: true } },
+        orderItems: { include: { product: true }, take: 1 },
+        _count: { select: { orderItems: true } },
+      },
+      ...skipTake(page),
     }),
   ]);
 
-  return {
-    rows: orders.map((o) => ({
+  return paginate(
+    orders.map((o) => ({
       orderNumber: o.orderNumber,
-      productTitle:
-        o._count.orderItems <= 1
-          ? (o.orderItems[0]?.product.title ?? "-")
-          : `${o.orderItems[0]?.product.title ?? "-"} และอีก ${o._count.orderItems - 1} รายการ`,
+      customerEmail: o.user.email,
+      productTitle: itemsSummary(o.orderItems[0]?.product.title, o._count.orderItems),
+      itemCount: o._count.orderItems,
       price: o.totalAmount,
       createdAt: o.createdAt.toISOString(),
       status: o.status as OrderStatus,
     })),
-    page: pageOf(page),
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     total,
+    page
+  );
+}
+
+export async function getAdminOrderDetail(orderNumber: string) {
+  const order = await db.order.findUnique({
+    where: { orderNumber },
+    include: {
+      user: { select: { id: true, email: true, displayName: true } },
+      orderItems: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          product: { select: { title: true, subtitle: true, game: { select: { name: true } } } },
+          stockItem: { select: { id: true, status: true, secretData: true } },
+          delivery: { select: { status: true, deliveredAt: true } },
+        },
+      },
+      payments: { orderBy: { createdAt: "desc" } },
+    },
+  });
+  if (!order) return null;
+
+  const items = order.orderItems.map((i) => ({
+    id: i.id,
+    title: `${i.product.title}${i.product.subtitle ? ` ${i.product.subtitle}` : ""}`,
+    gameName: i.product.game.name,
+    unitPrice: i.unitPrice,
+    stockStatus: (i.stockItem?.status as StockStatus | undefined) ?? null,
+    maskedCode: i.stockItem ? maskSecret(i.stockItem.secretData) : null,
+    deliveryStatus: i.delivery?.status ?? null,
+    deliveredAt: i.delivery?.deliveredAt?.toISOString() ?? null,
+  }));
+
+  return {
+    orderNumber: order.orderNumber,
+    status: order.status as OrderStatus,
+    totalAmount: order.totalAmount,
+    paymentMethod: order.paymentMethod,
+    createdAt: order.createdAt.toISOString(),
+    updatedAt: order.updatedAt.toISOString(),
+    customer: order.user,
+    items,
+    unfulfilledCount: items.filter((i) => !i.stockStatus).length,
+    payments: order.payments.map((p) => ({
+      id: p.id,
+      transactionId: p.transactionId,
+      provider: p.provider,
+      amount: p.amount,
+      status: p.status as PaymentStatus,
+      paidAt: p.paidAt?.toISOString() ?? null,
+      createdAt: p.createdAt.toISOString(),
+    })),
   };
 }
 
-export async function getAdminPayments({ q, page }: ListParams = {}): Promise<
-  Paginated<{ id: string; transactionId: string; orderNumber: string; provider: string; amount: number; status: PaymentStatus; paidAt: string | null }>
-> {
-  const where = q ? { transactionId: { contains: q } } : {};
+export interface PaymentListParams extends ListParams {
+  status?: PaymentStatus;
+}
+
+export async function getAdminPayments({ q, page, status }: PaymentListParams = {}) {
+  const where: Prisma.PaymentWhereInput = {
+    ...(q ? { OR: [{ transactionId: ci(q) }, { order: { orderNumber: ci(q) } }] } : {}),
+    ...(status ? { status } : {}),
+  };
   const [total, payments] = await Promise.all([
     db.payment.count({ where }),
     db.payment.findMany({
       where,
       orderBy: { createdAt: "desc" },
       include: { order: { select: { orderNumber: true } } },
-      skip: (pageOf(page) - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      ...skipTake(page),
     }),
   ]);
 
-  return {
-    rows: payments.map((p) => ({
+  return paginate(
+    payments.map((p) => ({
       id: p.id,
       transactionId: p.transactionId,
       orderNumber: p.order.orderNumber,
@@ -182,39 +376,126 @@ export async function getAdminPayments({ q, page }: ListParams = {}): Promise<
       status: p.status as PaymentStatus,
       paidAt: p.paidAt ? p.paidAt.toISOString() : null,
     })),
-    page: pageOf(page),
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     total,
-  };
+    page
+  );
 }
 
-export async function getAdminUsers({ q, page }: ListParams = {}): Promise<
-  Paginated<{ id: string; displayName: string; email: string; role: string; isActive: boolean; createdAt: string }>
-> {
-  const where = q ? { email: { contains: q } } : {};
+// ---------------------------------------------------------------
+// Users
+// ---------------------------------------------------------------
+
+export interface UserListParams extends ListParams {
+  role?: string;
+}
+
+export async function getAdminUsers({ q, page, role }: UserListParams = {}) {
+  const where: Prisma.UserWhereInput = {
+    ...(q ? { OR: [{ email: ci(q) }, { displayName: ci(q) }] } : {}),
+    ...(role ? { role } : {}),
+  };
   const [total, users] = await Promise.all([
     db.user.count({ where }),
     db.user.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: (pageOf(page) - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
+      include: { _count: { select: { orders: true } } },
+      ...skipTake(page),
     }),
   ]);
 
-  return {
-    rows: users.map((u) => ({
+  return paginate(
+    users.map((u) => ({
       id: u.id,
       displayName: u.displayName,
       email: u.email,
       role: u.role,
       isActive: u.isActive,
+      orderCount: u._count.orders,
       createdAt: u.createdAt.toISOString().slice(0, 10),
     })),
-    page: pageOf(page),
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
     total,
+    page
+  );
+}
+
+export async function getAdminUserDetail(id: string) {
+  const user = await db.user.findUnique({
+    where: { id },
+    include: {
+      orders: {
+        orderBy: { createdAt: "desc" },
+        take: 25,
+        include: { orderItems: { include: { product: { select: { title: true } } }, take: 1 }, _count: { select: { orderItems: true } } },
+      },
+    },
+  });
+  if (!user) return null;
+
+  const paid = user.orders.filter((o) => ["PAID", "PROCESSING", "DELIVERED"].includes(o.status));
+  return {
+    id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    role: user.role,
+    isActive: user.isActive,
+    createdAt: user.createdAt.toISOString(),
+    stats: {
+      orderCount: user.orders.length,
+      paidCount: paid.length,
+      totalSpent: paid.reduce((s, o) => s + o.totalAmount, 0),
+    },
+    orders: user.orders.map((o) => ({
+      orderNumber: o.orderNumber,
+      productTitle: itemsSummary(o.orderItems[0]?.product.title, o._count.orderItems),
+      price: o.totalAmount,
+      status: o.status as OrderStatus,
+      createdAt: o.createdAt.toISOString(),
+    })),
   };
+}
+
+// ---------------------------------------------------------------
+// Audit logs
+// ---------------------------------------------------------------
+
+export interface AuditListParams extends ListParams {
+  entity?: string;
+}
+
+export async function getAdminAuditLogs({ q, page, entity }: AuditListParams = {}) {
+  const where: Prisma.AuditLogWhereInput = {
+    ...(entity ? { entity } : {}),
+    ...(q ? { OR: [{ action: ci(q) }, { entityId: ci(q) }, { actor: { email: ci(q) } }, { actor: { displayName: ci(q) } }] } : {}),
+  };
+  const [total, logs] = await Promise.all([
+    db.auditLog.count({ where }),
+    db.auditLog.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: { actor: { select: { displayName: true, email: true } } },
+      ...skipTake(page),
+    }),
+  ]);
+  return paginate(
+    logs.map((l) => ({
+      id: l.id,
+      actor: l.actor.displayName,
+      actorEmail: l.actor.email,
+      action: l.action,
+      entity: l.entity,
+      entityId: l.entityId,
+      metadata: l.metadata,
+      createdAt: l.createdAt.toISOString(),
+    })),
+    total,
+    page
+  );
+}
+
+export async function getAuditEntities() {
+  const rows = await db.auditLog.findMany({ distinct: ["entity"], select: { entity: true }, orderBy: { entity: "asc" } });
+  return rows.map((r) => r.entity);
 }
 
 // ---------------------------------------------------------------
@@ -358,33 +639,4 @@ export async function getAnalytics(days: number): Promise<AnalyticsData> {
     paymentMethods: Array.from(methodAgg, ([method, count]) => ({ method, count })).sort((a, b) => b.count - a.count),
     orderStatus: Array.from(statusAgg, ([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count),
   };
-}
-
-export async function getAdminAuditLogs() {
-  const logs = await db.auditLog.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { actor: { select: { displayName: true } } },
-    take: 100,
-  });
-  return logs.map((l) => ({
-    id: l.id,
-    actor: l.actor.displayName,
-    action: l.action,
-    entity: l.entity,
-    createdAt: l.createdAt.toISOString(),
-  }));
-}
-
-export async function getAdminGames() {
-  const games = await db.game.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: { _count: { select: { products: true } } },
-  });
-  return games.map((g) => ({
-    id: g.id,
-    name: g.name,
-    slug: g.slug,
-    isActive: g.isActive,
-    productCount: g._count.products,
-  }));
 }

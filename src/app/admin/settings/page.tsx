@@ -3,20 +3,16 @@ import { SettingsForm } from "@/components/admin/SettingsForm";
 import { db } from "@/lib/db";
 
 export default async function AdminSettingsPage() {
-  const settings = await db.storeSetting.upsert({
-    where: { id: "default" },
-    update: {},
-    create: { id: "default" },
-  });
+  const settings = await db.storeSetting.findUnique({ where: { id: "default" } });
 
   return (
     <div>
-      <AdminPageHeader title="Settings" description="ตั้งค่าข้อมูลร้านค้า" />
+      <AdminPageHeader title="ตั้งค่าร้าน" description="ชื่อร้าน ช่องทางติดต่อ และลิงก์ Discord" />
       <SettingsForm
         initial={{
-          storeName: settings.storeName,
-          supportEmail: settings.supportEmail ?? "",
-          discordUrl: settings.discordUrl ?? "",
+          storeName: settings?.storeName ?? "Xelvex",
+          supportEmail: settings?.supportEmail ?? "",
+          discordUrl: settings?.discordUrl ?? "",
         }}
       />
     </div>

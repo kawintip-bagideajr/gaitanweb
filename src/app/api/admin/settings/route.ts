@@ -8,12 +8,8 @@ import { handleApiError } from "@/lib/api-errors";
 export async function GET() {
   try {
     await requireAdmin();
-    const settings = await db.storeSetting.upsert({
-      where: { id: "default" },
-      update: {},
-      create: { id: "default" },
-    });
-    return NextResponse.json(settings);
+    const settings = await db.storeSetting.findUnique({ where: { id: "default" } });
+    return NextResponse.json(settings ?? { id: "default", storeName: "Xelvex", supportEmail: null, discordUrl: null });
   } catch (err) {
     return handleApiError(err);
   }

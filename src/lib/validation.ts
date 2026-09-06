@@ -36,18 +36,52 @@ export const paymentWebhookSchema = z.object({
 // Admin mutations
 // ---------------------------------------------------------------
 
+// Either a path in /public ("/products/x.jpg") or an absolute http(s) URL.
+const imageRef = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((v) => v === "" || v.startsWith("/") || /^https?:\/\//i.test(v), "รูปภาพต้องเป็น URL (https://...) หรือ path ที่ขึ้นต้นด้วย /")
+  .optional()
+  .or(z.literal(""));
+
+const idList = z.array(z.string().min(1)).min(1, "กรุณาเลือกอย่างน้อย 1 รายการ").max(200);
+
 export const createProductSchema = z.object({
   gameId: z.string().min(1, "กรุณาเลือกเกม"),
   title: z.string().trim().min(2, "กรุณากรอกชื่อสินค้า").max(120),
   subtitle: z.string().trim().max(60).optional().or(z.literal("")),
   category: z.string().trim().max(60).optional().or(z.literal("")),
   price: z.number().int().min(1, "ราคาต้องมากกว่า 0").max(1_000_000),
+  image: imageRef,
+  sortOrder: z.number().int().min(0).max(9999).optional(),
   autoDelivery: z.boolean().default(true),
 });
 
 export const updateProductSchema = createProductSchema.partial().extend({
   isActive: z.boolean().optional(),
 });
+
+export const bulkProductSchema = z.object({
+  ids: idList,
+  isActive: z.boolean(),
+});
+
+export const bulkStockSchema = z.object({
+  ids: idList,
+  status: z.enum(["AVAILABLE", "DISABLED"]),
+});
+
+export const orderActionSchema = z.object({
+  action: z.enum(["cancel", "mark_paid", "retry_delivery", "refund"]),
+});
+
+export const updateUserSchema = z
+  .object({
+    isActive: z.boolean().optional(),
+    role: z.enum(["CUSTOMER", "ADMIN"]).optional(),
+  })
+  .refine((v) => v.isActive !== undefined || v.role !== undefined, "ไม่มีข้อมูลให้แก้ไข");
 
 export const addStockSchema = z.object({
   productId: z.string().min(1),
@@ -73,10 +107,12 @@ export const createGameSchema = z.object({
     .min(2, "กรุณากรอก slug")
     .max(60)
     .regex(/^[a-z0-9-]+$/, "slug ใช้ได้เฉพาะตัวพิมพ์เล็ก ตัวเลข และขีดกลาง"),
+  coverImage: imageRef,
 });
 
 export const updateGameSchema = z.object({
   name: z.string().trim().min(2).max(60).optional(),
+  coverImage: imageRef,
   isActive: z.boolean().optional(),
 });
 
