@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -113,6 +114,46 @@ export function AdminSidebar() {
 
 export function AdminMobileNav() {
   const [open, setOpen] = useState(false);
+  // false during SSR/hydration, true once on the client (portal target exists).
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  // The bar has backdrop-blur, which would clip a position:fixed drawer
+  // rendered inside it to the bar's own height — so portal it to <body>.
+  const drawer = (
+    <div className={cn("fixed inset-0 z-50 transition-opacity duration-300", open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0")}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
+      <div
+        className={cn(
+          "absolute left-0 top-0 flex h-full w-72 flex-col border-r border-border bg-surface transition-transform duration-300",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex h-14 items-center justify-between border-b border-border px-4">
+          <Logo />
+          <button
+            type="button"
+            aria-label="ปิดเมนู"
+            onClick={() => setOpen(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
+          >
+            <X className="h-4.5 w-4.5" />
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <NavLinks onNavigate={() => setOpen(false)} />
+        </nav>
+      </div>
+    </div>
+  );
 
   return (
     <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-surface/90 px-4 backdrop-blur-md lg:hidden">
@@ -129,30 +170,9 @@ export function AdminMobileNav() {
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className={cn("fixed inset-0 z-50 transition-opacity duration-300", open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0")}>
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-        <div
-          className={cn(
-            "absolute left-0 top-0 flex h-full w-72 flex-col border-r border-border bg-surface transition-transform duration-300",
-            open ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          <div className="flex h-14 items-center justify-between border-b border-border px-4">
-            <Logo />
-            <button
-              type="button"
-              aria-label="ปิดเมนู"
-              onClick={() => setOpen(false)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
-            >
-              <X className="h-4.5 w-4.5" />
-            </button>
-          </div>
-          <nav className="flex-1 overflow-y-auto px-3 py-4">
-            <NavLinks onNavigate={() => setOpen(false)} />
-          </nav>
-        </div>
-      </div>
+      {mounted && createPortal(drawer, document.body)}
     </div>
   );
 }
+
+const subscribeNoop = () => () => {};

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, LogOut, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react";
@@ -12,6 +13,18 @@ import { useSession } from "@/lib/use-session";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  // false during SSR/hydration, true once on the client (portal target exists).
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+
+  // Keep the page from scrolling behind the open drawer.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
   const { count: cartCount } = useCart();
   const { user, logout } = useSession();
   const router = useRouter();
@@ -22,6 +35,76 @@ export function Navbar() {
     router.push("/");
     router.refresh();
   }
+
+  // The header uses backdrop-blur, which makes it the containing block
+  // for any position:fixed descendant — a drawer rendered inside it would
+  // be clipped to the 64px header strip. Portal it to <body> instead.
+  const drawer = (
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 lg:hidden ${
+        open ? "pointer-events-auto opacity-100" : "pointer-events-none invisible opacity-0"
+      }`}
+    >
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => setOpen(false)}
+      />
+      <div
+        className={`absolute right-0 top-0 h-full w-72 border-l border-border bg-surface p-6 transition-transform duration-300 ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="mb-8 flex items-center justify-between">
+          <Logo />
+          <button
+            aria-label="ปิดเมนู"
+            onClick={() => setOpen(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
+          >
+            <X className="h-4.5 w-4.5" />
+          </button>
+        </div>
+        <nav className="flex flex-col gap-1">
+          {SITE_CONFIG.nav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        {user ? (
+          <div className="mt-6 flex flex-col gap-2">
+            <div className="flex items-center gap-2 px-1 text-sm text-muted">
+              <User className="h-4 w-4" /> {user.displayName}
+            </div>
+            <Link href="/orders" onClick={() => setOpen(false)}>
+              <Button variant="secondary" className="w-full">
+                คำสั่งซื้อของฉัน
+              </Button>
+            </Link>
+            {user.role === "ADMIN" && (
+              <Link href="/admin" onClick={() => setOpen(false)}>
+                <Button variant="secondary" className="w-full">
+                  Admin
+                </Button>
+              </Link>
+            )}
+            <Button variant="ghost" className="w-full" onClick={handleLogout}>
+              ออกจากระบบ
+            </Button>
+          </div>
+        ) : (
+          <Link href="/login" onClick={() => setOpen(false)} className="mt-6 block">
+            <Button className="w-full">เข้าสู่ระบบ</Button>
+          </Link>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -105,71 +188,9 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      <div
-        className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 lg:hidden ${
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none invisible opacity-0"
-        }`}
-      >
-        <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        />
-        <div
-          className={`absolute right-0 top-0 h-full w-72 border-l border-border bg-surface p-6 transition-transform duration-300 ${
-            open ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="mb-8 flex items-center justify-between">
-            <Logo />
-            <button
-              aria-label="ปิดเมนู"
-              onClick={() => setOpen(false)}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-foreground"
-            >
-              <X className="h-4.5 w-4.5" />
-            </button>
-          </div>
-          <nav className="flex flex-col gap-1">
-            {SITE_CONFIG.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          {user ? (
-            <div className="mt-6 flex flex-col gap-2">
-              <div className="flex items-center gap-2 px-1 text-sm text-muted">
-                <User className="h-4 w-4" /> {user.displayName}
-              </div>
-              <Link href="/orders" onClick={() => setOpen(false)}>
-                <Button variant="secondary" className="w-full">
-                  คำสั่งซื้อของฉัน
-                </Button>
-              </Link>
-              {user.role === "ADMIN" && (
-                <Link href="/admin" onClick={() => setOpen(false)}>
-                  <Button variant="secondary" className="w-full">
-                    Admin
-                  </Button>
-                </Link>
-              )}
-              <Button variant="ghost" className="w-full" onClick={handleLogout}>
-                ออกจากระบบ
-              </Button>
-            </div>
-          ) : (
-            <Link href="/login" onClick={() => setOpen(false)} className="mt-6 block">
-              <Button className="w-full">เข้าสู่ระบบ</Button>
-            </Link>
-          )}
-        </div>
-      </div>
+      {mounted && createPortal(drawer, document.body)}
     </header>
   );
 }
+
+const subscribeNoop = () => () => {};
