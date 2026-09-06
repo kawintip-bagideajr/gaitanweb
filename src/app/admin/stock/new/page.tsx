@@ -1,18 +1,14 @@
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { StockForm } from "@/components/admin/StockForm";
-import { db } from "@/lib/db";
+import { getProductOptions } from "@/lib/admin-queries";
 
-export default async function NewStockPage() {
-  const products = await db.product.findMany({
-    where: { isActive: true },
-    select: { id: true, title: true, subtitle: true },
-    orderBy: { sortOrder: "asc" },
-  });
+export default async function NewStockPage({ searchParams }: { searchParams: Promise<{ productId?: string }> }) {
+  const [{ productId }, products] = await Promise.all([searchParams, getProductOptions()]);
 
   return (
     <div>
-      <AdminPageHeader title="Add Stock" description="เพิ่มโค้ด/คีย์ดิจิทัลเข้าคลังสินค้า" />
-      <StockForm products={products} />
+      <AdminPageHeader title="เพิ่มสต๊อก" description="วางโค้ดทีละบรรทัด หรือนำเข้าจากไฟล์ — โค้ดที่มีอยู่แล้วจะถูกข้ามอัตโนมัติ" />
+      <StockForm products={products} defaultProductId={productId} />
     </div>
   );
 }

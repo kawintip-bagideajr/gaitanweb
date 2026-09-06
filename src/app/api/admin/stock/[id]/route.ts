@@ -9,6 +9,24 @@ const patchSchema = z.object({
   status: z.enum(["AVAILABLE", "DISABLED"]),
 });
 
+/** Reveal one code for a support case — always audit-logged. */
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const admin = await requireAdmin();
+    const { id } = await params;
+    const stock = await db.stockItem.findUnique({
+      where: { id },
+      include: { product: { select: { title: true, subtitle: true } } },
+    });
+    if (!stock) return NextResponse.json({ error: "ไม่พบรายการสต๊อก" }, { status: 404 });
+
+    await writeAuditLog(admin.id, "stock.reveal", "StockItem", id, { product: stock.product.title });
+    return NextResponse.json({ id: stock.id, code: stock.secretData, status: stock.status });
+  } catch (err) {
+    return handleApiError(err);
+  }
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const admin = await requireAdmin();
