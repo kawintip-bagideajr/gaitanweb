@@ -11,15 +11,15 @@ export function StatsBar({ stats }: { stats: StoreStats }) {
 
   return (
     <section className="border-b border-border bg-surface/60">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-6 sm:grid-cols-4 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-4 gap-2 px-4 py-4 sm:gap-3 sm:px-6 sm:py-6 lg:px-8">
         {TILES.map(({ icon: Icon, value, label }) => (
           <div
             key={label}
-            className="clip-x-sm flex flex-col items-center gap-1.5 border border-border bg-surface py-5 text-center"
+            className="clip-x-sm flex flex-col items-center gap-1 border border-border bg-surface px-1 py-3 text-center sm:gap-1.5 sm:py-5"
           >
-            <Icon className="h-5 w-5 text-primary-strong" />
-            <span className="text-2xl font-extrabold text-foreground sm:text-3xl">{value}</span>
-            <span className="text-xs text-muted">{label}</span>
+            <Icon className="h-4 w-4 text-primary-strong sm:h-5 sm:w-5" />
+            <span className="text-lg font-extrabold text-foreground sm:text-3xl">{value}</span>
+            <span className="text-[10px] leading-tight text-muted sm:text-xs">{label}</span>
           </div>
         ))}
       </div>

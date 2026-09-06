@@ -24,13 +24,13 @@ export function Hero() {
         }}
       />
 
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-28">
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-28">
         <div className="animate-fade-up">
           <span className="clip-x-sm inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold tracking-widest text-primary-soft">
             {SITE_CONFIG.tagline}
           </span>
 
-          <h1 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 text-4xl font-extrabold leading-[0.98] tracking-tight text-foreground sm:mt-6 sm:text-6xl lg:text-7xl">
             เติมเกม รับไอเทมจริง
             <br />
             <span className="text-gradient">ไวในไม่กี่วินาที</span>
@@ -51,7 +51,7 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-4">
             {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
               <div key={label} className="flex items-center gap-2 text-sm text-muted">
                 <Icon className={`h-4 w-4 ${color}`} />

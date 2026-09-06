@@ -65,7 +65,7 @@ export function ProductCard({ product }: { product: Product }) {
               className="absolute inset-x-0 top-0 h-1"
               style={{ background: isLegendary ? "var(--accent-gold)" : theme.gradient }}
             />
-            <div className="absolute inset-x-3 top-4 flex items-start justify-between gap-2">
+            <div className="absolute inset-x-2 top-3 flex items-start justify-between gap-1.5 sm:inset-x-3 sm:top-4 sm:gap-2">
               <Badge tone={inStock ? (lowStock ? "warning" : "success") : "neutral"}>
                 {inStock ? (lowStock ? `เหลือ ${product.stockCount}` : "พร้อมส่ง") : "หมดสต๊อก"}
               </Badge>
@@ -83,23 +83,23 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col gap-1 p-4">
+          <div className="flex flex-1 flex-col gap-0.5 p-3 sm:gap-1 sm:p-4">
             <span
               className="text-xs font-bold uppercase tracking-wide"
               style={{ color: theme.accent }}
             >
               {product.category ?? product.gameName}
             </span>
-            <h3 className="text-base font-bold text-foreground">{product.title}</h3>
+            <h3 className="text-sm font-bold leading-snug text-foreground sm:text-base">{product.title}</h3>
             {product.subtitle && (
-              <p className="text-sm font-medium text-primary-soft">{product.subtitle}</p>
+              <p className="text-xs font-medium text-primary-soft sm:text-sm">{product.subtitle}</p>
             )}
           </div>
         </Link>
 
-        <div className="flex flex-col gap-2.5 border-t border-border p-4">
+        <div className="flex flex-col gap-2 border-t border-border p-3 sm:gap-2.5 sm:p-4">
           <span
-            className="text-2xl font-extrabold tracking-tight"
+            className="text-xl font-extrabold tracking-tight sm:text-2xl"
             style={{ color: isLegendary ? "var(--accent-gold)" : theme.accent }}
           >
             {formatTHB(product.price)}
