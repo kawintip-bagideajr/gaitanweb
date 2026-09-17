@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div
       className={cn(
-        "group relative transition-transform duration-300 hover:-translate-y-1.5",
+        "group relative overflow-hidden transition-transform duration-300 hover:-translate-y-1.5",
         isLegendary && "legendary-border"
       )}
       style={!isLegendary ? ({ "--game-glow": theme.glow } as React.CSSProperties) : undefined}
