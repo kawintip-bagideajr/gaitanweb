@@ -8,6 +8,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ExpandableTitle } from "@/components/ui/ExpandableTitle";
 import { CheckoutSteps } from "@/components/marketplace/CheckoutSteps";
 import { formatTHB } from "@/lib/utils";
 import { getGameTheme } from "@/lib/game-theme";
@@ -77,7 +78,7 @@ export default function CartPage() {
                     <span className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
                       {item.gameName}
                     </span>
-                    <p className="break-words text-base font-bold text-foreground">{item.title}</p>
+                    <ExpandableTitle text={item.title} className="text-base font-bold text-foreground" />
                     <p className="text-sm text-muted">{formatTHB(item.price)} / ชิ้น</p>
                     <p className="mt-1 text-base font-extrabold sm:hidden" style={{ color: theme.accent }}>
                       {formatTHB(lineTotal)}

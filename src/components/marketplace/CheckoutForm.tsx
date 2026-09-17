@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ExpandableTitle } from "@/components/ui/ExpandableTitle";
 import { cn, formatTHB } from "@/lib/utils";
 import { getGameTheme } from "@/lib/game-theme";
 import { useCart } from "@/lib/cart-store";
@@ -105,7 +106,7 @@ export function CheckoutForm() {
                     <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
                       {item.gameName}
                     </span>
-                    <p className="break-words text-sm font-bold text-foreground">{item.title}</p>
+                    <ExpandableTitle text={item.title} className="text-sm font-bold text-foreground" />
                     <p className="text-xs text-muted">
                       {item.quantity} × {formatTHB(item.price)}
                     </p>
