@@ -59,64 +59,65 @@ export default function CartPage() {
               return (
                 <Card
                   key={item.productId}
-                  className="relative flex items-center gap-4 overflow-hidden p-4 sm:gap-5"
+                  className="relative flex flex-col gap-3 overflow-hidden p-4 sm:flex-row sm:items-center sm:gap-5"
                   style={{ boxShadow: `0 0 0 1px ${theme.accent}55` }}
                 >
                   <div className="absolute inset-x-0 top-0 h-1" style={{ background: theme.gradient }} />
 
-                  <div className="clip-x-sm relative h-20 w-20 shrink-0 overflow-hidden bg-surface-2">
-                    {item.image ? (
-                      <Image src={item.image} alt={item.title} fill sizes="80px" className="object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-muted-2">
-                        <Zap className="h-6 w-6" />
-                      </div>
-                    )}
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="clip-x-sm relative h-16 w-16 shrink-0 overflow-hidden bg-surface-2 sm:h-20 sm:w-20">
+                      {item.image ? (
+                        <Image src={item.image} alt={item.title} fill sizes="80px" className="object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-muted-2">
+                          <Zap className="h-6 w-6" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
+                        {item.gameName}
+                      </span>
+                      <ExpandableTitle text={item.title} className="text-base font-bold text-foreground" />
+                      <p className="text-sm text-muted">{formatTHB(item.price)} / ชิ้น</p>
+                    </div>
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <span className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
-                      {item.gameName}
-                    </span>
-                    <ExpandableTitle text={item.title} className="text-base font-bold text-foreground" />
-                    <p className="text-sm text-muted">{formatTHB(item.price)} / ชิ้น</p>
-                    <p className="mt-1 text-base font-extrabold sm:hidden" style={{ color: theme.accent }}>
+                  <div className="flex items-center justify-between gap-3 sm:shrink-0 sm:justify-end sm:gap-5">
+                    <div className="clip-x-sm flex shrink-0 items-center border border-border bg-surface-2">
+                      <button
+                        onClick={() => setQuantity(item.productId, item.quantity - 1)}
+                        className="flex h-10 w-10 items-center justify-center text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
+                        aria-label="ลดจำนวน"
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="w-9 text-center text-sm font-bold text-foreground">{item.quantity}</span>
+                      <button
+                        onClick={() => setQuantity(item.productId, item.quantity + 1)}
+                        className="flex h-10 w-10 items-center justify-center text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
+                        aria-label="เพิ่มจำนวน"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <span
+                      className="shrink-0 text-right text-lg font-extrabold tracking-tight sm:w-28 sm:text-xl"
+                      style={{ color: theme.accent }}
+                    >
                       {formatTHB(lineTotal)}
-                    </p>
-                  </div>
+                    </span>
 
-                  <div className="clip-x-sm flex shrink-0 items-center border border-border bg-surface-2">
                     <button
-                      onClick={() => setQuantity(item.productId, item.quantity - 1)}
-                      className="flex h-10 w-10 items-center justify-center text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
-                      aria-label="ลดจำนวน"
+                      onClick={() => removeItem(item.productId)}
+                      aria-label="ลบสินค้า"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-2 transition-colors hover:bg-[var(--danger-soft)] hover:text-danger"
                     >
-                      <Minus className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="w-9 text-center text-sm font-bold text-foreground">{item.quantity}</span>
-                    <button
-                      onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                      className="flex h-10 w-10 items-center justify-center text-muted transition-colors hover:bg-surface-hover hover:text-foreground"
-                      aria-label="เพิ่มจำนวน"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-
-                  <span
-                    className="hidden w-28 shrink-0 text-right text-xl font-extrabold tracking-tight sm:block"
-                    style={{ color: theme.accent }}
-                  >
-                    {formatTHB(lineTotal)}
-                  </span>
-
-                  <button
-                    onClick={() => removeItem(item.productId)}
-                    aria-label="ลบสินค้า"
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-2 transition-colors hover:bg-[var(--danger-soft)] hover:text-danger"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </Card>
               );
             })}
