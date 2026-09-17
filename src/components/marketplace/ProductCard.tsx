@@ -90,9 +90,11 @@ export function ProductCard({ product }: { product: Product }) {
             >
               {product.category ?? product.gameName}
             </span>
-            <h3 className="text-sm font-bold leading-snug text-foreground sm:text-base">{product.title}</h3>
+            <h3 className="line-clamp-2 text-sm font-bold leading-snug text-foreground sm:text-base">
+              {product.title}
+            </h3>
             {product.subtitle && (
-              <p className="text-xs font-medium text-primary-soft sm:text-sm">{product.subtitle}</p>
+              <p className="line-clamp-1 text-xs font-medium text-primary-soft sm:text-sm">{product.subtitle}</p>
             )}
           </div>
         </Link>

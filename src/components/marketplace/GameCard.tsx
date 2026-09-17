@@ -42,8 +42,10 @@ export function GameCard({ game }: { game: Game }) {
           style={{ background: theme.gradient }}
         />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 sm:p-4">
-          <div>
-            <h3 className="text-base font-extrabold tracking-tight text-foreground sm:text-xl">{game.name}</h3>
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-extrabold tracking-tight text-foreground sm:text-xl">
+              {game.name}
+            </h3>
             <p className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
               {game.productCount} สินค้า
             </p>
