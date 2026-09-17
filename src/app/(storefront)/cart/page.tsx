@@ -50,8 +50,8 @@ export default function CartPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-          <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="flex min-w-0 flex-col gap-4">
             {items.map((item) => {
               const theme = getGameTheme(item.gameName);
               const lineTotal = item.price * item.quantity;

@@ -78,8 +78,8 @@ export function CheckoutForm() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_340px]">
-      <div className="flex flex-col gap-6">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="flex min-w-0 flex-col gap-6">
         <Card className="p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-base font-bold text-foreground">รายการสินค้า</h2>
