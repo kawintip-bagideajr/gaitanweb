@@ -77,7 +77,7 @@ export default function CartPage() {
                     <span className="text-xs font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
                       {item.gameName}
                     </span>
-                    <p className="truncate text-base font-bold text-foreground">{item.title}</p>
+                    <p className="break-words text-base font-bold text-foreground">{item.title}</p>
                     <p className="text-sm text-muted">{formatTHB(item.price)} / ชิ้น</p>
                     <p className="mt-1 text-base font-extrabold sm:hidden" style={{ color: theme.accent }}>
                       {formatTHB(lineTotal)}

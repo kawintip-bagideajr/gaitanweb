@@ -105,7 +105,7 @@ export function CheckoutForm() {
                     <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: theme.accent }}>
                       {item.gameName}
                     </span>
-                    <p className="truncate text-sm font-bold text-foreground">{item.title}</p>
+                    <p className="break-words text-sm font-bold text-foreground">{item.title}</p>
                     <p className="text-xs text-muted">
                       {item.quantity} × {formatTHB(item.price)}
                     </p>
