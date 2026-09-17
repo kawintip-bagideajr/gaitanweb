@@ -26,6 +26,7 @@ export interface Product {
   gameName: string;
   title: string;
   subtitle?: string;
+  description?: string;
   category?: string;
   image: string;
   price: number;

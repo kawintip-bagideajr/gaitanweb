@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Zap } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Tabs } from "@/components/ui/Tabs";
+import { ReadMore } from "@/components/ui/ReadMore";
 import { ProductBuyPanel } from "@/components/marketplace/ProductBuyPanel";
 import { getGames, getProductBySlug } from "@/lib/queries";
 
@@ -51,7 +52,9 @@ export default async function ProductDetailPage({
             {
               key: "detail",
               label: "รายละเอียดสินค้า",
-              content: (
+              content: product.description ? (
+                <ReadMore text={product.description} />
+              ) : (
                 <p>
                   {product.title} {product.subtitle} สำหรับเกม {product.gameName} — โค้ดจริงจากผู้จัดจำหน่ายที่ได้รับอนุญาต จัดส่งอัตโนมัติทันทีหลังชำระเงินสำเร็จ
                 </p>

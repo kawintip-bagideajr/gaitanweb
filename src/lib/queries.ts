@@ -19,6 +19,7 @@ function toProduct(p: ProductWithCounts): Product {
     gameName: p.game.name,
     title: p.title,
     subtitle: p.subtitle ?? undefined,
+    description: p.description ?? undefined,
     category: p.category ?? undefined,
     image: p.image ?? "",
     price: p.price,
