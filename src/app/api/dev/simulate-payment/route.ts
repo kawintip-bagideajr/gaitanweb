@@ -21,6 +21,16 @@ const bodySchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // Hard-blocked in production: without this, anyone signed in on the live
+    // site could hit this route and get a real stock item/secret handed to
+    // them without ever actually paying. Only usable in local dev now.
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "ระบบจำลองการชำระเงินถูกปิดใช้งานบนเว็บจริง กรุณาใช้ช่องทางชำระเงินจริง" },
+        { status: 403 }
+      );
+    }
+
     const user = await requireUser();
     const body = await req.json().catch(() => null);
     const parsed = bodySchema.safeParse(body);

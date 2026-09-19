@@ -55,11 +55,22 @@ export function CheckoutForm() {
     // 2. No real payment gateway is wired up yet — this stands in for
     //    the gateway confirming payment and firing its webhook. The
     //    result page then reads the order's real, server-decided status.
-    await fetch("/api/dev/simulate-payment", {
+    //    Blocked outright in production (see the route) so nothing can
+    //    mark an order paid without a real payment — surface that clearly
+    //    instead of silently sending the customer to a result page that
+    //    would just spin on "PENDING_PAYMENT" forever.
+    const simRes = await fetch("/api/dev/simulate-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderNumber, outcome: "SUCCESS" }),
     });
+
+    if (!simRes.ok) {
+      const simData = await simRes.json().catch(() => ({}));
+      setError(simData.error ?? "ระบบชำระเงินยังไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลังหรือติดต่อทีมงาน");
+      setSubmitting(false);
+      return;
+    }
 
     router.push(`/orders/${orderNumber}/result`);
   }
