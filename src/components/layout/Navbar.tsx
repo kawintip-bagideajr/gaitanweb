@@ -87,11 +87,11 @@ export function Navbar() {
               </Button>
             </Link>
             {user.role === "ADMIN" && (
-              <Link href="/admin" onClick={() => setOpen(false)}>
+              <a href="https://xelvex-admin-system.vercel.app" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
                 <Button variant="secondary" className="w-full">
                   Admin
                 </Button>
-              </Link>
+              </a>
             )}
             <Button variant="ghost" className="w-full" onClick={handleLogout}>
               ออกจากระบบ
@@ -154,13 +154,15 @@ export function Navbar() {
                 <Package className="h-4.5 w-4.5" />
               </Link>
               {user.role === "ADMIN" && (
-                <Link
-                  href="/admin"
+                <a
+                  href="https://xelvex-admin-system.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
                   aria-label="Admin"
                 >
                   <LayoutDashboard className="h-4.5 w-4.5" />
-                </Link>
+                </a>
               )}
               <span className="mx-1 max-w-[100px] truncate text-sm text-muted">{user.displayName}</span>
               <button
