@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, CreditCard, Lock, QrCode, ShieldCheck, Wallet, Zap } from "lucide-react";
+import { Check, Clock, CreditCard, Lock, QrCode, ShieldCheck, Wallet, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -19,6 +19,12 @@ const PAYMENT_METHODS = [
   { key: "promptpay", label: "พร้อมเพย์ / QR Code", hint: "สแกนจ่ายได้ทุกธนาคาร", icon: QrCode, color: "#38bdf8" },
   { key: "card", label: "บัตรเครดิต / เดบิต", hint: "Visa, Mastercard, JCB", icon: CreditCard, color: "#9d5ff0" },
 ] as const;
+
+// Flip to true once a real payment gateway (Omise/Opn etc.) is wired up —
+// see /api/dev/simulate-payment and /api/payments/webhook. Until then the
+// checkout flow is intentionally disabled rather than letting customers pick
+// a payment method that silently fails, which read as untrustworthy.
+const PAYMENT_GATEWAY_LIVE = false;
 
 export function CheckoutForm() {
   const { items, subtotal, count, clear } = useCart();
@@ -134,8 +140,18 @@ export function CheckoutForm() {
         <Card className="p-5 sm:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-foreground">ช่องทางชำระเงิน</h2>
-            <Badge tone="warning">โหมดทดสอบ — ยังไม่ตัดเงินจริง</Badge>
+            {!PAYMENT_GATEWAY_LIVE && <Badge tone="warning">เร็วๆ นี้</Badge>}
           </div>
+
+          {!PAYMENT_GATEWAY_LIVE && (
+            <div className="mb-4 flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/10 p-3.5 text-sm text-warning">
+              <Clock className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                ระบบชำระเงินจริงอยู่ระหว่างเปิดให้บริการ ยังไม่สามารถสั่งซื้อได้ในตอนนี้ — ช่องทางด้านล่างเป็นตัวอย่างสิ่งที่จะรองรับเร็วๆ นี้
+              </span>
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-3">
             {PAYMENT_METHODS.map((m) => {
               const selected = method === m.key;
@@ -145,9 +161,11 @@ export function CheckoutForm() {
                   type="button"
                   key={m.key}
                   aria-pressed={selected}
+                  disabled={!PAYMENT_GATEWAY_LIVE}
                   onClick={() => setMethod(m.key)}
                   className={cn(
                     "clip-x-sm flex flex-col gap-3 border p-4 text-left transition-all duration-200",
+                    !PAYMENT_GATEWAY_LIVE && "cursor-not-allowed opacity-50",
                     selected
                       ? "border-primary bg-primary/10 shadow-[0_0_24px_-8px_var(--primary-glow)]"
                       : "border-border bg-surface-2/40 hover:border-border-strong hover:bg-surface-2"
@@ -200,9 +218,23 @@ export function CheckoutForm() {
             <span className="text-3xl font-extrabold tracking-tight text-primary-soft">{formatTHB(subtotal)}</span>
           </div>
 
-          <Button className="mt-5 w-full" size="lg" disabled={submitting} onClick={handleConfirm}>
-            <Lock className="h-4.5 w-4.5" />
-            {submitting ? "กำลังดำเนินการ..." : "ยืนยันการชำระเงิน"}
+          <Button
+            className="mt-5 w-full"
+            size="lg"
+            disabled={submitting || !PAYMENT_GATEWAY_LIVE}
+            onClick={handleConfirm}
+          >
+            {PAYMENT_GATEWAY_LIVE ? (
+              <>
+                <Lock className="h-4.5 w-4.5" />
+                {submitting ? "กำลังดำเนินการ..." : "ยืนยันการชำระเงิน"}
+              </>
+            ) : (
+              <>
+                <Clock className="h-4.5 w-4.5" />
+                ระบบชำระเงินยังไม่เปิดให้บริการ
+              </>
+            )}
           </Button>
 
           {error && <p className="mt-3 text-sm text-danger">{error}</p>}
