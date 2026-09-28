@@ -3,6 +3,15 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import { handleApiError } from "@/lib/api-errors";
+import { decrypt } from "@/lib/security/crypto";
+
+const ENCRYPTED_SHAPE = /^[0-9a-f]{24}:[0-9a-f]{32}:[0-9a-f]+$/i;
+
+function resolveCode(secretData: string | null | undefined): string | null {
+  if (!secretData) return null;
+  if (!ENCRYPTED_SHAPE.test(secretData)) return secretData;
+  return decrypt(secretData) ?? secretData;
+}
 
 /**
  * Full delivered codes for support cases (customer lost them, needs a
@@ -29,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ord
     return NextResponse.json({
       items: order.orderItems.map((i) => ({
         title: `${i.product.title}${i.product.subtitle ? ` ${i.product.subtitle}` : ""}`,
-        code: i.stockItem?.secretData ?? null,
+        code: resolveCode(i.stockItem?.secretData),
       })),
     });
   } catch (err) {

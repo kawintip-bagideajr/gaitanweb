@@ -32,7 +32,15 @@ export function clearRateLimit(key: string) {
 }
 
 export function getClientIp(req: Request): string {
+  // x-forwarded-for is a comma-separated hop chain that a client can seed
+  // with any values it wants; only the LAST entry — appended by Vercel's own
+  // edge from the actual TCP connection — is trustworthy. Using the first
+  // entry (as before) let anyone bypass IP-based rate limiting by sending a
+  // fake header value.
   const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
+  if (forwarded) {
+    const hops = forwarded.split(",").map((h) => h.trim()).filter(Boolean);
+    if (hops.length > 0) return hops[hops.length - 1];
+  }
   return req.headers.get("x-real-ip") ?? "unknown";
 }

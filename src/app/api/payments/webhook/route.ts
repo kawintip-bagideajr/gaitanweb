@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { paymentWebhookSchema } from "@/lib/validation";
 import { processPaymentEvent } from "@/lib/payments";
 
@@ -8,12 +9,22 @@ import { processPaymentEvent } from "@/lib/payments";
  * is wired up, `/api/dev/simulate-payment` exercises this same
  * `processPaymentEvent` logic from the checkout flow.
  */
+function isValidSecret(provided: string | null): boolean {
+  const expected = process.env.PAYMENT_WEBHOOK_SECRET;
+  if (!expected || !provided) return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  // Constant-time compare — a naive `!==` leaks how many leading bytes
+  // matched via response timing, letting the secret be guessed byte by byte.
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export async function POST(req: NextRequest) {
   // A real gateway signs its webhook body (HMAC over the raw payload).
   // This shared-secret header is a placeholder for that signature
   // check — swap it for real signature verification before going live.
   const providedSecret = req.headers.get("x-webhook-secret");
-  if (!process.env.PAYMENT_WEBHOOK_SECRET || providedSecret !== process.env.PAYMENT_WEBHOOK_SECRET) {
+  if (!isValidSecret(providedSecret)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

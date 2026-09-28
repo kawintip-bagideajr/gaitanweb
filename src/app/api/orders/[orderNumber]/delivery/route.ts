@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { decrypt } from "@/lib/security/crypto";
+
+// Stock added through the canonical admin system is stored as
+// `ivHex:authTagHex:ciphertextHex` (AES-256-GCM). Older/manually-seeded
+// rows may still be plain text — treat anything not matching that shape as
+// already-plaintext rather than failing to decrypt it.
+const ENCRYPTED_SHAPE = /^[0-9a-f]{24}:[0-9a-f]{32}:[0-9a-f]+$/i;
+
+function resolveCode(secretData: string | null | undefined): string | null {
+  if (!secretData) return null;
+  if (!ENCRYPTED_SHAPE.test(secretData)) return secretData;
+  return decrypt(secretData) ?? secretData;
+}
 
 export async function GET(
   _req: Request,
@@ -33,9 +46,7 @@ export async function GET(
     return NextResponse.json({
       items: order.orderItems.map((i) => ({
         title: `${i.product.title}${i.product.subtitle ? ` ${i.product.subtitle}` : ""}`,
-        // secretData is stored pre-encrypted at write time in a real
-        // deployment; this demo stores it directly (see seed.ts note).
-        code: i.stockItem?.secretData ?? null,
+        code: resolveCode(i.stockItem?.secretData),
       })),
     });
   } catch (err) {

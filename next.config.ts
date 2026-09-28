@@ -1,6 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // No legitimate reason for this site to be framed by another
+          // origin — blocks clickjacking (fake overlay tricking a logged-in
+          // user into clicking a real buy/checkout button underneath).
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none';" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
+  },
   images: {
     // Admins can point a product/game image at any https URL.
     remotePatterns: [{ protocol: "https", hostname: "**" }],

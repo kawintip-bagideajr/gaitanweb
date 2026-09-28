@@ -7,6 +7,19 @@ import { handleApiError } from "@/lib/api-errors";
 
 export async function POST(req: NextRequest) {
   try {
+    // This legacy internal panel is deprecated in favor of the standalone
+    // Xelvex admin system, which encrypts stock secrets at write time and
+    // runs writes through audit logging/RBAC/Dual-Control. Adding stock
+    // here would write plaintext secrets the delivery route can't safely
+    // tell apart from real ciphertext, and bypasses all of that — so it's
+    // blocked in production the same way the dev payment simulator is.
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "แผงควบคุมนี้เลิกใช้แล้ว กรุณาเพิ่มสต็อกผ่านระบบแอดมินหลัก (Xelvex Admin System)" },
+        { status: 403 }
+      );
+    }
+
     const admin = await requireAdmin();
     const body = await req.json().catch(() => null);
     const parsed = addStockSchema.safeParse(body);
